@@ -1,4 +1,4 @@
-# 🧠 Task Manager App (Full Stack Starter)
+# Task Manager App (Full Stack Starter)
 
 This is a full-stack boilerplate for a Task Management app using:
 
@@ -15,8 +15,8 @@ This is a full-stack boilerplate for a Task Management app using:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-cd YOUR_REPO_NAME
+git clone https://github.com/arking115/task-management-app.git
+cd task-management-app 
 ```
 
 ### 2. Install Docker
