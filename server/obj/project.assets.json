@@ -1438,24 +1438,31 @@
     ]
   },
   "packageFolders": {
-    "/Users/alexs/.nuget/packages/": {}
+    "C:\\Users\\Poly\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/alexs/Desktop/task-manager-app/server/server.csproj",
+      "projectUniqueName": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj",
       "projectName": "server",
-      "projectPath": "/Users/alexs/Desktop/task-manager-app/server/server.csproj",
-      "packagesPath": "/Users/alexs/.nuget/packages/",
-      "outputPath": "/Users/alexs/Desktop/task-manager-app/server/obj/",
+      "projectPath": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj",
+      "packagesPath": "C:\\Users\\Poly\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/alexs/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Poly\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1468,7 +1475,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net7.0": {
@@ -1512,7 +1525,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.203/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202\\RuntimeIdentifierGraph.json"
       }
     }
   },
@@ -1521,7 +1534,7 @@
       "code": "NU1603",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "server depends on Npgsql.EntityFrameworkCore.PostgreSQL (>= 7.0.5) but Npgsql.EntityFrameworkCore.PostgreSQL 7.0.5 was not found. An approximate best match of Npgsql.EntityFrameworkCore.PostgreSQL 7.0.11 was resolved.",
+      "message": "server depends on Npgsql.EntityFrameworkCore.PostgreSQL (>= 7.0.5) but Npgsql.EntityFrameworkCore.PostgreSQL 7.0.5 was not found. Npgsql.EntityFrameworkCore.PostgreSQL 7.0.11 was resolved instead.",
       "libraryId": "Npgsql.EntityFrameworkCore.PostgreSQL",
       "targetGraphs": [
         "net7.0"
