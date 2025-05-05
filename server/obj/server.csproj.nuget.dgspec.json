@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj": {}
+    "D:\\facultate\\II project\\task-management-app\\server\\server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj": {
+    "D:\\facultate\\II project\\task-management-app\\server\\server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj",
+        "projectUniqueName": "D:\\facultate\\II project\\task-management-app\\server\\server.csproj",
         "projectName": "server",
-        "projectPath": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\server.csproj",
-        "packagesPath": "C:\\Users\\Poly\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Poly\\OneDrive\\Documents\\Facultate\\An3Sem2\\IndustrialInformatics\\Project\\task-management-app\\server\\obj\\",
+        "projectPath": "D:\\facultate\\II project\\task-management-app\\server\\server.csproj",
+        "packagesPath": "C:\\Users\\Paul\\.nuget\\packages\\",
+        "outputPath": "D:\\facultate\\II project\\task-management-app\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Poly\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Paul\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,18 +39,16 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[7.*, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.5, )"
@@ -67,6 +66,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.9.0, )"
             }
           },
           "imports": [
@@ -88,7 +91,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }
