@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import PageWrapper from '../components/PageWrapper';
 
 interface Task {
@@ -11,146 +12,218 @@ interface Task {
   createdAt: string;
 }
 
-const mockTasks: Task[] = [
-  {
-    id: 1,
-    title: 'Design login screen',
-    description: 'Create layout and design in Figma for the login screen.',
-    status: 'To Do',
-    deadline: '2025-05-25',
-    createdAt: '2025-05-01',
-    category: { id: 1, name: 'Frontend' },
-  },
-  {
-    id: 2,
-    title: 'Implement task API',
-    description: 'Build and test the backend task API endpoints.',
-    status: 'In Progress',
-    deadline: '2025-05-20',
-    createdAt: '2025-05-02',
-    category: { id: 2, name: 'Backend' },
-  },
-  {
-    id: 3,
-    title: 'Fix dashboard pie chart',
-    description: 'Resolve rendering issue in pie chart on dashboard.',
-    status: 'Done',
-    deadline: '2025-05-18',
-    createdAt: '2025-05-03',
-    category: { id: 3, name: 'Bugfix' },
-  },
-];
-
 const Tasks = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    deadline: '',
+    categoryId: '',
+  });
 
-  const handleStatusChange = (id: number, newStatus: Task['status']) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, status: newStatus } : task
-      )
-    );
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5232/tasks', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTasks(response.data);
+      } catch (err: any) {
+        console.error(err);
+        setError('Failed to load tasks.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleStatusChange = async (id: number, newStatus: Task['status']) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5232/tasks/${id}/status`, {
+        status: newStatus,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTasks(prev =>
+        prev.map(task =>
+          task.id === id ? { ...task, status: newStatus } : task
+        )
+      );
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
   };
 
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:5232/tasks', {
+        title: newTask.title,
+        description: newTask.description,
+        deadline: newTask.deadline,
+        categoryId: parseInt(newTask.categoryId),
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setTasks(prev => [...prev, response.data]);
+      setNewTask({ title: '', description: '', deadline: '', categoryId: '' });
+      setShowForm(false);
+    } catch (err) {
+      console.error('Failed to create task', err);
+    }
+  };
+
+  const groupedTasks = {
+    'To Do': tasks.filter(task => task.status === 'To Do'),
+    'In Progress': tasks.filter(task => task.status === 'In Progress'),
+    Done: tasks.filter(task => task.status === 'Done'),
+  };
+
+  if (loading) return <PageWrapper wide><p>Loading...</p></PageWrapper>;
+  if (error) return <PageWrapper wide><p style={{ color: 'red' }}>{error}</p></PageWrapper>;
+
   return (
-<PageWrapper wide>
-  <div>
-    <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Your Tasks</h1>
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '2rem',
-      }}
-    >
-      {['To Do', 'In Progress', 'Done'].map((status) => (
-        <div key={status}>
-          <h3>{status}</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {tasks
-              .filter((task) => task.status === status)
-              .map((task) => {
-                const isExpanded = expandedTaskId === task.id;
-                return (
-                  <div
-                    key={task.id}
-                    onClick={() =>
-                      setExpandedTaskId(isExpanded ? null : task.id)
-                    }
-                    style={{
-                      background: '#fff',
-                      padding: isExpanded ? '1.5rem' : '1rem',
-                      borderRadius: '12px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      borderLeft: `4px solid ${
-                        status === 'To Do'
-                          ? '#8884d8'
-                          : status === 'In Progress'
-                          ? '#82ca9d'
-                          : '#ffc658'
-                      }`,
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      transform: isExpanded ? 'scale(1.03)' : 'scale(1)',
-                    }}
-                  >
-                    <div style={{ fontWeight: 600, fontSize: '1.05rem' }}>
-                      {task.title}
-                    </div>
-                    <div style={{ fontSize: '0.9rem', color: '#555' }}>
-                      {task.category.name}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: '#999' }}>
-                      Deadline: {new Date(task.deadline).toLocaleDateString()}
-                    </div>
+    <PageWrapper wide>
+      <div>
+        <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Your Tasks</h1>
 
-                    {isExpanded && (
-                      <div style={{ marginTop: '1rem' }}>
-                        <p style={{ color: '#333', fontSize: '0.95rem' }}>
-                          {task.description}
-                        </p>
-                        <label
-                          htmlFor={`status-${task.id}`}
-                          style={{ display: 'block', marginTop: '1rem' }}
-                          onClick={(e) => e.stopPropagation()} // prevent label click from collapsing
-                        >
-                          Change Status:
-                        </label>
-                        <select
-                          id={`status-${task.id}`}
-                          value={task.status}
-                          onClick={(e) => e.stopPropagation()} // ✅ this line prevents closing
-                          onChange={(e) =>
-                            handleStatusChange(
-                              task.id,
-                              e.target.value as Task['status']
-                            )
-                          }
-                          style={{
-                            marginTop: '0.5rem',
-                            padding: '0.4rem 0.6rem',
-                            borderRadius: '6px',
-                            fontSize: '0.9rem',
-                            width: '100%',
-                          }}
-                        >
-                          <option value="To Do">To Do</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Done">Done</option>
-                        </select>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: 'var(--primary)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            {showForm ? 'Cancel' : 'Add Task'}
+          </button>
+
+          {showForm && (
+            <form onSubmit={handleCreateTask} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: 500 }}>
+              <input
+                type="text"
+                placeholder="Title"
+                required
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              />
+              <textarea
+                placeholder="Description"
+                value={newTask.description}
+                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+              />
+              <input
+                type="date"
+                required
+                value={newTask.deadline}
+                onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
+              />
+              <input
+                type="number"
+                placeholder="Category ID"
+                required
+                value={newTask.categoryId}
+                onChange={(e) => setNewTask({ ...newTask, categoryId: e.target.value })}
+              />
+              <button type="submit" style={{ padding: '8px 12px', backgroundColor: '#82ca9d', color: '#fff', border: 'none', borderRadius: '6px' }}>
+                Create Task
+              </button>
+            </form>
+          )}
         </div>
-      ))}
-    </div>
-  </div>
-</PageWrapper>
 
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+          {Object.entries(groupedTasks).map(([status, tasks]) => (
+            <div key={status}>
+              <h3>{status}</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {tasks.map((task) => {
+                  const isExpanded = expandedTaskId === task.id;
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() =>
+                        setExpandedTaskId(isExpanded ? null : task.id)
+                      }
+                      style={{
+                        background: '#fff',
+                        padding: isExpanded ? '1.5rem' : '1rem',
+                        borderRadius: '12px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        borderLeft: `4px solid ${
+                          status === 'To Do'
+                            ? '#8884d8'
+                            : status === 'In Progress'
+                            ? '#82ca9d'
+                            : '#ffc658'
+                        }`,
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        transform: isExpanded ? 'scale(1.03)' : 'scale(1)',
+                      }}
+                    >
+                      <div style={{ fontWeight: 600, fontSize: '1.05rem' }}>{task.title}</div>
+                      <div style={{ fontSize: '0.9rem', color: '#555' }}>{task.category.name}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#999' }}>
+                        Deadline: {new Date(task.deadline).toLocaleDateString()}
+                      </div>
+
+                      {isExpanded && (
+                        <div style={{ marginTop: '1rem' }}>
+                          <p style={{ color: '#333', fontSize: '0.95rem' }}>{task.description}</p>
+                          <label
+                            htmlFor={`status-${task.id}`}
+                            style={{ display: 'block', marginTop: '1rem' }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Change Status:
+                          </label>
+                          <select
+                            id={`status-${task.id}`}
+                            value={task.status}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) =>
+                              handleStatusChange(task.id, e.target.value as Task['status'])
+                            }
+                            style={{
+                              marginTop: '0.5rem',
+                              padding: '0.4rem 0.6rem',
+                              borderRadius: '6px',
+                              fontSize: '0.9rem',
+                              width: '100%',
+                            }}
+                          >
+                            <option value="To Do">To Do</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </PageWrapper>
   );
 };
 

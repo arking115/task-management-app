@@ -2,21 +2,32 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+  
     try {
-      const response = await axios.post('/auth/login', { email, password }, { withCredentials: true });
-      window.location.href = '/dashboard';
+      const response = await axios.post('http://localhost:5232/auth/login', { email, password });
+  
+      // 1. Save the token
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+  
+      // 2. Set it for future axios requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  
+      // 3. Redirect to dashboard
+      navigate('/dashboard');
     } catch (err: any) {
-      console.log(err); // for debugging
+      console.log(err);
       if (err.response?.status === 401) {
         setError('Invalid email or password.');
       } else {
@@ -24,6 +35,7 @@ const Login = () => {
       }
     }
   };
+  
 
   return (
     <PageWrapper>
