@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\server",
+    "\\server\\bin",
+    "\\server\\Controllers",
+    "\\server\\Data",
+    "\\server\\Models",
+    "\\server\\obj"
+  ],
+  "SelectedNode": "\\server\\Controllers\\TaskController.cs",
+  "PreviewInSolutionExplorer": false
+}
