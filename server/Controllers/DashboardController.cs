@@ -30,30 +30,7 @@ namespace server.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            //Console.WriteLine("Entering DashboardController.Get");
-
-            //Console.WriteLine("User Claims:");
-            //foreach (var claim in User.Claims)
-            //{
-            //    Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
-            //}
-
-            var isAdmin = User.IsInRole("Admin");
-            //Console.WriteLine($"IsAdmin: {isAdmin}");
-
             IQueryable<TodoTask> q = _db.Tasks;
-
-            if (!isAdmin)
-            {
-                var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //Console.WriteLine($"Sub: {sub ?? "null"}");
-                if (string.IsNullOrEmpty(sub) || !int.TryParse(sub, out var userId))
-                {
-                    //Console.WriteLine($"Failed to parse user ID. Sub value: '{sub}'");
-                    return Unauthorized(new { message = "Invalid user ID in token" });
-                }
-                q = q.Where(t => t.AssignedUserId == userId);
-            }
 
             var totalTasks = await q.CountAsync();
 
