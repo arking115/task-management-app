@@ -1,16 +1,24 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/Navbar';
+import Tasks from './pages/Tasks';
 
 function App() {
   return (
-    <div style={{ width: '100%', maxWidth: '600px', padding: '2rem' }}>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </div>
+    <>
+      <Navbar />
+      <div style={{ paddingTop: '60px' }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/tasks" element={<Tasks />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 

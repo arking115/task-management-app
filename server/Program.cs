@@ -9,19 +9,22 @@ using System.Security.Claims;
 using server.Data;
 using server.Models;
 using Microsoft.AspNetCore.Authorization;
+using server.Seed;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowCredentials();
     });
 });
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -51,6 +54,7 @@ builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
+server.Seed.DbSeeder.Seed(app);
 
 if (app.Environment.IsDevelopment())
 {
@@ -58,9 +62,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+DbSeeder.Seed(app);
 app.Run();
