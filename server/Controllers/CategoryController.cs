@@ -10,7 +10,7 @@ using server.Models;
 
 [ApiController]
 [Route("categories")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class CategoryController : ControllerBase
 {
     private readonly AppDbContext _db;

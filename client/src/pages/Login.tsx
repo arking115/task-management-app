@@ -1,26 +1,53 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import axios from '../api/axios';
+import { Link, useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
+import { useAuth } from '../contexts/AuthContext';
+import { jwtDecode } from 'jwt-decode';
+
+interface TokenPayload {
+  [key: string]: any;
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
+}
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      const response = await axios.post('/auth/login', { email, password }, { withCredentials: true });
-      window.location.href = '/dashboard';
+      const response = await axios.post('http://localhost:5232/auth/login', { email, password });
+
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+
+      // Decode role from JWT token
+      const decoded: TokenPayload = jwtDecode(token);
+      const rawRole = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      const role = rawRole?.toLowerCase(); // normalize to 'admin' or 'user'
+
+      if (!role) {
+        throw new Error('Role not found in token.');
+      }
+
+      if (role === 'admin' || role === 'user') {
+        login(role); // Update context with role
+      } else {
+        throw new Error('Invalid role in token.');
+      }
+      navigate('/dashboard');
     } catch (err: any) {
-      console.log(err); // for debugging
+      console.error(err);
       if (err.response?.status === 401) {
         setError('Invalid email or password.');
       } else {
-        setError(err.response?.data?.message || 'Something went wrong. Try again later.');
+        setError(err.message || 'Something went wrong. Try again later.');
       }
     }
   };
