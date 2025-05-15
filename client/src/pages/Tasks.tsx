@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
 
 interface Task {
   id: number;
   title: string;
   description?: string;
-  status: 'To Do' | 'In Progress' | 'Done';
+  status: 'New' | 'InProgress' | 'OnHold' | 'Completed' | 'Cancelled';
   deadline: string;
   category: { id: number; name: string };
   createdAt: string;
@@ -47,14 +47,14 @@ const Tasks = () => {
   const handleStatusChange = async (id: number, newStatus: Task['status']) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5232/tasks/${id}/status`, {
-        status: newStatus,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(
+        `http://localhost:5232/tasks/${id}/status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      setTasks(prev =>
-        prev.map(task =>
+      setTasks((prev) =>
+        prev.map((task) =>
           task.id === id ? { ...task, status: newStatus } : task
         )
       );
@@ -67,16 +67,20 @@ const Tasks = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5232/tasks', {
-        title: newTask.title,
-        description: newTask.description,
-        deadline: newTask.deadline,
-        categoryId: parseInt(newTask.categoryId),
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.post(
+        'http://localhost:5232/tasks',
+        {
+          title: newTask.title,
+          description: newTask.description,
+          deadline: newTask.deadline,
+          categoryId: parseInt(newTask.categoryId),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      setTasks(prev => [...prev, response.data]);
+      setTasks((prev) => [...prev, response.data]);
       setNewTask({ title: '', description: '', deadline: '', categoryId: '' });
       setShowForm(false);
     } catch (err) {
@@ -85,9 +89,11 @@ const Tasks = () => {
   };
 
   const groupedTasks = {
-    'To Do': tasks.filter(task => task.status === 'To Do'),
-    'In Progress': tasks.filter(task => task.status === 'In Progress'),
-    Done: tasks.filter(task => task.status === 'Done'),
+    New: tasks.filter((task) => task.status === 'New'),
+    InProgress: tasks.filter((task) => task.status === 'InProgress'),
+    OnHold: tasks.filter((task) => task.status === 'OnHold'),
+    Completed: tasks.filter((task) => task.status === 'Completed'),
+    Cancelled: tasks.filter((task) => task.status === 'Cancelled'),
   };
 
   if (loading) return <PageWrapper wide><p>Loading...</p></PageWrapper>;
@@ -148,7 +154,7 @@ const Tasks = () => {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem' }}>
           {Object.entries(groupedTasks).map(([status, tasks]) => (
             <div key={status}>
               <h3>{status}</h3>
@@ -158,20 +164,22 @@ const Tasks = () => {
                   return (
                     <div
                       key={task.id}
-                      onClick={() =>
-                        setExpandedTaskId(isExpanded ? null : task.id)
-                      }
+                      onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
                       style={{
                         background: '#fff',
                         padding: isExpanded ? '1.5rem' : '1rem',
                         borderRadius: '12px',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                         borderLeft: `4px solid ${
-                          status === 'To Do'
+                          status === 'New'
                             ? '#8884d8'
-                            : status === 'In Progress'
+                            : status === 'InProgress'
                             ? '#82ca9d'
-                            : '#ffc658'
+                            : status === 'OnHold'
+                            ? '#ffbb28'
+                            : status === 'Completed'
+                            ? '#00c49f'
+                            : '#ff6961'
                         }`,
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
@@ -209,9 +217,11 @@ const Tasks = () => {
                               width: '100%',
                             }}
                           >
-                            <option value="To Do">To Do</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Done">Done</option>
+                            <option value="New">New</option>
+                            <option value="InProgress">In Progress</option>
+                            <option value="OnHold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
                           </select>
                         </div>
                       )}

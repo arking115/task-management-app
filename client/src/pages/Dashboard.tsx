@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
 import {
   PieChart,
@@ -12,12 +12,14 @@ import {
 import { Navigate } from 'react-router-dom';
 
 interface StatusCounts {
-  'To Do': number;
-  'In Progress': number;
-  'Done': number;
+  New: number;
+  InProgress: number;
+  OnHold: number;
+  Completed: number;
+  Cancelled: number;
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#d0ed57'];
 
 const Dashboard = () => {
   const [statusCounts, setStatusCounts] = useState<StatusCounts | null>(null);
@@ -67,13 +69,13 @@ const Dashboard = () => {
       </div>
     );
   }
-  
-  
 
   const chartData = [
-    { name: 'To Do', value: statusCounts['To Do'] },
-    { name: 'In Progress', value: statusCounts['In Progress'] },
-    { name: 'Done', value: statusCounts['Done'] }
+    { name: 'New', value: statusCounts.New },
+    { name: 'In Progress', value: statusCounts.InProgress },
+    { name: 'On Hold', value: statusCounts.OnHold },
+    { name: 'Completed', value: statusCounts.Completed },
+    { name: 'Cancelled', value: statusCounts.Cancelled }
   ];
 
   return (
@@ -85,9 +87,11 @@ const Dashboard = () => {
 
         <div style={{ fontSize: '1.25rem', marginBottom: '2rem' }}>
           <p>Total Tasks: <strong>{totalTasks}</strong></p>
-          <p>📋 To Do: <strong>{statusCounts['To Do']}</strong></p>
-          <p>🚧 In Progress: <strong>{statusCounts['In Progress']}</strong></p>
-          <p>✅ Done: <strong>{statusCounts['Done']}</strong></p>
+          <p>🆕 New: <strong>{statusCounts.New}</strong></p>
+          <p>🚧 In Progress: <strong>{statusCounts.InProgress}</strong></p>
+          <p>⏸️ On Hold: <strong>{statusCounts.OnHold}</strong></p>
+          <p>✅ Completed: <strong>{statusCounts.Completed}</strong></p>
+          <p>❌ Cancelled: <strong>{statusCounts.Cancelled}</strong></p>
         </div>
 
         <div style={{ width: '100%', height: 350 }}>

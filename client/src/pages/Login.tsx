@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
 import { useNavigate } from 'react-router-dom';
@@ -21,10 +21,6 @@ const Login = () => {
       const { token } = response.data;
       localStorage.setItem('token', token);
   
-      // 2. Set it for future axios requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  
-      // 3. Redirect to dashboard
       navigate('/dashboard');
     } catch (err: any) {
       console.log(err);
