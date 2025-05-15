@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Task {
   id: number;
@@ -8,16 +9,30 @@ interface Task {
   description?: string;
   status: 'New' | 'InProgress' | 'OnHold' | 'Completed' | 'Cancelled';
   deadline: string;
-  category: { id: number; name: string };
   createdAt: string;
+  category: { id: number; name: string };
+  assignedUser: { id: number; name: string; email: string };
+}
+
+interface Category {
+  id: number;
+  name: string;
 }
 
 const Tasks = () => {
+  const { userRole } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [sortField, setSortField] = useState<'date_added' | ''>('date_added');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -25,61 +40,63 @@ const Tasks = () => {
     categoryId: '',
   });
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5232/tasks', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTasks(response.data);
-      } catch (err: any) {
-        console.error(err);
-        setError('Failed to load tasks.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, []);
-
-  const handleStatusChange = async (id: number, newStatus: Task['status']) => {
+  const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:5232/tasks/${id}/status`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const params: any = {};
+      if (sortField) {
+        params.sort = sortField;
+        params.order = sortOrder;
+      }
+      if (statusFilter) params.status = statusFilter;
+      if (categoryFilter) params.category = categoryFilter;
 
+      const [taskRes, categoryRes] = await Promise.all([
+        axios.get('/tasks', { params }),
+        axios.get('/categories'),
+      ]);
+      setTasks(taskRes.data);
+      setCategories(categoryRes.data);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load tasks or categories.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [sortField, sortOrder, statusFilter, categoryFilter]);
+
+  const toggleSort = (field: 'date_added') => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleStatusChange = async (id: number, status: Task['status']) => {
+    try {
+      await axios.put(`/tasks/${id}`, { status });
       setTasks((prev) =>
-        prev.map((task) =>
-          task.id === id ? { ...task, status: newStatus } : task
-        )
+        prev.map((task) => (task.id === id ? { ...task, status } : task))
       );
     } catch (err) {
-      console.error('Failed to update status', err);
+      console.error('Failed to update task status', err);
     }
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'http://localhost:5232/tasks',
-        {
-          title: newTask.title,
-          description: newTask.description,
-          deadline: newTask.deadline,
-          categoryId: parseInt(newTask.categoryId),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+      const response = await axios.post('/tasks', {
+        title: newTask.title,
+        description: newTask.description,
+        deadline: newTask.deadline,
+        categoryId: parseInt(newTask.categoryId),
+      });
       setTasks((prev) => [...prev, response.data]);
       setNewTask({ title: '', description: '', deadline: '', categoryId: '' });
       setShowForm(false);
@@ -88,22 +105,14 @@ const Tasks = () => {
     }
   };
 
-  const groupedTasks = {
-    New: tasks.filter((task) => task.status === 'New'),
-    InProgress: tasks.filter((task) => task.status === 'InProgress'),
-    OnHold: tasks.filter((task) => task.status === 'OnHold'),
-    Completed: tasks.filter((task) => task.status === 'Completed'),
-    Cancelled: tasks.filter((task) => task.status === 'Cancelled'),
-  };
-
   if (loading) return <PageWrapper wide><p>Loading...</p></PageWrapper>;
   if (error) return <PageWrapper wide><p style={{ color: 'red' }}>{error}</p></PageWrapper>;
 
   return (
     <PageWrapper wide>
-      <div>
-        <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Your Tasks</h1>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Tasks</h1>
 
+      {userRole === 'admin' && (
         <div style={{ marginBottom: '1.5rem' }}>
           <button
             onClick={() => setShowForm(!showForm)}
@@ -121,7 +130,10 @@ const Tasks = () => {
           </button>
 
           {showForm && (
-            <form onSubmit={handleCreateTask} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: 500 }}>
+            <form
+              onSubmit={handleCreateTask}
+              style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: 500 }}
+            >
               <input
                 type="text"
                 placeholder="Title"
@@ -140,101 +152,108 @@ const Tasks = () => {
                 value={newTask.deadline}
                 onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
               />
-              <input
-                type="number"
-                placeholder="Category ID"
+              <select
                 required
                 value={newTask.categoryId}
                 onChange={(e) => setNewTask({ ...newTask, categoryId: e.target.value })}
-              />
+              >
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
               <button type="submit" style={{ padding: '8px 12px', backgroundColor: '#82ca9d', color: '#fff', border: 'none', borderRadius: '6px' }}>
                 Create Task
               </button>
             </form>
           )}
         </div>
+      )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem' }}>
-          {Object.entries(groupedTasks).map(([status, tasks]) => (
-            <div key={status}>
-              <h3>{status}</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {tasks.map((task) => {
-                  const isExpanded = expandedTaskId === task.id;
-                  return (
-                    <div
-                      key={task.id}
-                      onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
-                      style={{
-                        background: '#fff',
-                        padding: isExpanded ? '1.5rem' : '1rem',
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        borderLeft: `4px solid ${
-                          status === 'New'
-                            ? '#8884d8'
-                            : status === 'InProgress'
-                            ? '#82ca9d'
-                            : status === 'OnHold'
-                            ? '#ffbb28'
-                            : status === 'Completed'
-                            ? '#00c49f'
-                            : '#ff6961'
-                        }`,
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        transform: isExpanded ? 'scale(1.03)' : 'scale(1)',
-                      }}
-                    >
-                      <div style={{ fontWeight: 600, fontSize: '1.05rem' }}>{task.title}</div>
-                      <div style={{ fontSize: '0.9rem', color: '#555' }}>{task.category.name}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#999' }}>
-                        Deadline: {new Date(task.deadline).toLocaleDateString()}
-                      </div>
-
-                      {isExpanded && (
-                        <div style={{ marginTop: '1rem' }}>
-                          <p style={{ color: '#333', fontSize: '0.95rem' }}>{task.description}</p>
-                          <label
-                            htmlFor={`status-${task.id}`}
-                            style={{ display: 'block', marginTop: '1rem' }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Change Status:
-                          </label>
-                          <select
-                            id={`status-${task.id}`}
-                            value={task.status}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) =>
-                              handleStatusChange(task.id, e.target.value as Task['status'])
-                            }
-                            style={{
-                              marginTop: '0.5rem',
-                              padding: '0.4rem 0.6rem',
-                              borderRadius: '6px',
-                              fontSize: '0.9rem',
-                              width: '100%',
-                            }}
-                          >
-                            <option value="New">New</option>
-                            <option value="InProgress">In Progress</option>
-                            <option value="OnHold">On Hold</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                          </select>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+      {/* Task Table */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', borderRadius: '8px', overflow: 'hidden' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f5f5f5' }}>
+            <th style={thStyle} onClick={() => toggleSort('date_added')} title="Sort by Date">
+              Date Added {sortField === 'date_added' && (sortOrder === 'asc' ? '▲' : '▼')}
+            </th>
+            <th style={thStyle}>Title</th>
+            <th style={thStyle}>Assigned User</th>
+            <th style={thStyle}>
+              <div onClick={() => setShowStatusDropdown(!showStatusDropdown)} style={{ cursor: 'pointer' }}>
+                Status ▼
               </div>
-            </div>
+              {showStatusDropdown && (
+                <select onChange={(e) => setStatusFilter(e.target.value)} value={statusFilter}>
+                  <option value="">All</option>
+                  <option value="New">New</option>
+                  <option value="InProgress">In Progress</option>
+                  <option value="OnHold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              )}
+            </th>
+            <th style={thStyle}>
+              <div onClick={() => setShowCategoryDropdown(!showCategoryDropdown)} style={{ cursor: 'pointer' }}>
+                Category ▼
+              </div>
+              {showCategoryDropdown && (
+                <select onChange={(e) => setCategoryFilter(e.target.value)} value={categoryFilter}>
+                  <option value="">All</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              )}
+            </th>
+            <th style={thStyle}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.map((task) => (
+            <tr key={task.id} style={{ borderBottom: '1px solid #eee' }}>
+              <td style={tdStyle}>{new Date(task.createdAt).toLocaleDateString()}</td>
+              <td style={tdStyle}>{task.title}</td>
+              <td style={tdStyle}>{task.assignedUser?.name || 'Unassigned'}</td>
+              <td style={tdStyle}>
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+                >
+                  <option value="New">New</option>
+                  <option value="InProgress">In Progress</option>
+                  <option value="OnHold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </td>
+              <td style={tdStyle}>{task.category.name}</td>
+              <td style={tdStyle}>—</td>
+            </tr>
           ))}
-        </div>
-      </div>
+        </tbody>
+      </table>
     </PageWrapper>
   );
+};
+
+// Styling helpers
+const thStyle: React.CSSProperties = {
+  padding: '12px 16px',
+  textAlign: 'left',
+  fontWeight: 'bold',
+  fontSize: '0.95rem',
+  color: '#444',
+  cursor: 'pointer',
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: '12px 16px',
+  fontSize: '0.95rem',
+  color: '#333',
 };
 
 export default Tasks;

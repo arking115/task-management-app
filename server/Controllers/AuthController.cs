@@ -97,17 +97,3 @@ public IActionResult Me()
     }
 }
 }
-
-
-
-
-// For testing token creation with postman
-
-//    [Authorize]
-//    [HttpGet("me")]
-//    public IActionResult Me()
-//=> Ok(new {
-//    Id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
-//    Email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value,
-//    Role = User.FindFirst(ClaimTypes.Role)?.Value
-//});

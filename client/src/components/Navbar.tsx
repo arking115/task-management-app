@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   if (isAuthPage) return null;
@@ -23,6 +24,11 @@ const Navbar = () => {
     boxShadow: '0 1px 4px rgba(0,0,0,0.05)'
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
   return (
     <nav
       style={{
@@ -35,24 +41,52 @@ const Navbar = () => {
         borderBottom: '1px solid #e0e0e0',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         zIndex: 1000,
         height: '50px'
       }}
     >
-      {/* Logo / App Name */}
-      <Link to="/dashboard" style={{ fontWeight: 'bold', fontSize: '1.3rem', textDecoration: 'none', color: '#1a1a1a' }}>
-        Task Manager
-      </Link>
+      {/* Left Side: Logo and Links */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Link
+          to="/dashboard"
+          style={{
+            fontWeight: 'bold',
+            fontSize: '1.3rem',
+            textDecoration: 'none',
+            color: '#1a1a1a',
+            marginRight: '2rem'
+          }}
+        >
+          Task Manager
+        </Link>
 
-      {/* Navigation Links */}
-      <div style={{ display: 'flex', gap: '1.2rem', marginLeft: '2rem' }}>
-        <HoverableLink to="/dashboard" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
-          Dashboard
-        </HoverableLink>
-        <HoverableLink to="/tasks" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
-          Tasks
-        </HoverableLink>
+        <div style={{ display: 'flex', gap: '1.2rem' }}>
+          <HoverableLink to="/dashboard" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+            Dashboard
+          </HoverableLink>
+          <HoverableLink to="/tasks" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+            Tasks
+          </HoverableLink>
+        </div>
       </div>
+
+      {/* Right Side: Logout */}
+      <button
+        onClick={handleLogout}
+        style={{
+          padding: '8px 16px',
+          borderRadius: '8px',
+          border: '1px solid #ff4d4f',
+          backgroundColor: '#ff4d4f',
+          color: '#fff',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          fontSize: '0.95rem'
+        }}
+      >
+        Logout
+      </button>
     </nav>
   );
 };
