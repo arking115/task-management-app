@@ -1,3 +1,5 @@
+import React from 'react';
+
 const PageWrapper = ({
   children,
   wide = false,
@@ -8,22 +10,28 @@ const PageWrapper = ({
   return (
     <div
       style={{
-        height: 'calc(100vh - 60px)',
+        minHeight: '100vh',
+        width: '100%',
+        background: 'radial-gradient(circle at top left, #F0F4FF, #F9FAFB)',
+        padding: '3rem 2rem',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        padding: '1rem',
+        alignItems: 'flex-start',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: wide ? '1200px' : '600px', // 👈 wider if needed
-          padding: '2rem',
-          border: '1px solid #eee',
-          borderRadius: '12px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-          backgroundColor: '#fff',
+          maxWidth: wide ? '1440px' : '900px',
+          background: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '24px',
+          padding: '3rem 2.5rem',
+          boxShadow: `
+            0 4px 12px rgba(0, 0, 0, 0.04),
+            0 8px 40px rgba(99, 102, 241, 0.1)
+          `,
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
         }}
       >
         {children}
