@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Task {
   id: number;
@@ -30,6 +31,7 @@ const statusColors: Record<Task['status'], string> = {
 const Tasks = () => {
   const { userRole } = useAuth();
   const isAdmin = userRole === 'admin';
+  const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -219,7 +221,11 @@ const Tasks = () => {
           </thead>
           <tbody>
             {tasks.map((task) => (
-              <tr key={task.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
+              <tr
+                key={task.id}
+                style={{ borderBottom: '1px solid #E5E7EB', cursor: 'pointer' }}
+                onClick={() => navigate(`/tasks/${task.id}`)}
+              >
                 <td style={tdStyle}>{new Date(task.createdAt).toLocaleDateString()}</td>
                 <td style={tdStyle}>{task.title}</td>
                 <td style={tdStyle}>{task.assignedUser?.name || '—'}</td>
@@ -238,6 +244,7 @@ const Tasks = () => {
                       cursor: 'pointer',
                       appearance: 'none',
                     }}
+                    onClick={(e) => e.stopPropagation()} // prevent row click on dropdown
                   >
                     <option value="New">New</option>
                     <option value="InProgress">In Progress</option>
