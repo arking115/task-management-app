@@ -10,7 +10,6 @@ using server.Models;
 using System.ComponentModel.DataAnnotations;
 using StatusEnum = server.Models.TaskStatus;
 
-
 namespace server.Controllers
 {
     [ApiController]
@@ -49,7 +48,6 @@ namespace server.Controllers
                 .Include(t => t.Category)
                 .AsQueryable();
 
-            // non-admins see only their tasks
             if (!isAdmin)
             {
                 var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -58,7 +56,6 @@ namespace server.Controllers
                 q = q.Where(t => t.AssignedUserId == userId);
             }
 
-            // filtering
             if (!string.IsNullOrEmpty(status))
             {
                 if (!Enum.TryParse<StatusEnum>(status, true, out var st))
@@ -71,10 +68,7 @@ namespace server.Controllers
             if (categoryId.HasValue)
                 q = q.Where(t => t.CategoryId == categoryId.Value);
 
-            // sorting
-            var direction = sortOrder?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true
-                ? "desc"
-                : "asc";
+            var direction = sortOrder?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true ? "desc" : "asc";
 
             switch (sortBy?.ToLowerInvariant())
             {
@@ -109,11 +103,13 @@ namespace server.Controllers
                             t.AssignedUser.Name
                         }
                         : null,
-                    Category = new
-                    {
-                        t.Category.Id,
-                        t.Category.Name
-                    },
+                    Category = t.Category != null
+                        ? new
+                        {
+                            t.Category.Id,
+                            t.Category.Name
+                        }
+                        : null,
                     t.CreatedAt,
                     t.UpdatedAt
                 })
@@ -125,46 +121,48 @@ namespace server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTask(int id)
         {
-            var todo = await _db.Tasks
+            var task = await _db.Tasks
                 .Include(t => t.AssignedUser)
                 .Include(t => t.Category)
                 .Include(t => t.TaskHistories)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (todo == null)
+            if (task == null)
                 return NotFound(new { message = $"Task with id {id} not found." });
 
-            // non-admins may only view their own tasks
             var isAdmin = User.IsInRole("Admin");
             if (!isAdmin)
             {
                 var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(sub, out var userId) || todo.AssignedUserId != userId)
+                if (!int.TryParse(sub, out var userId) || task.AssignedUserId != userId)
                     return Forbid();
             }
 
-            // shape the response DTO
             var result = new
             {
-                todo.Id,
-                todo.Title,
-                todo.Description,
-                Status = todo.Status.ToString(),
-                todo.Deadline,
-                AssignedUser = new
-                {
-                    todo.AssignedUser.Id,
-                    todo.AssignedUser.Name,
-                    todo.AssignedUser.Email
-                },
-                Category = new
-                {
-                    todo.Category.Id,
-                    todo.Category.Name
-                },
-                todo.CreatedAt,
-                todo.UpdatedAt,
-                History = todo.TaskHistories
+                task.Id,
+                task.Title,
+                task.Description,
+                Status = task.Status.ToString(),
+                task.Deadline,
+                AssignedUser = task.AssignedUser != null
+                    ? new
+                    {
+                        task.AssignedUser.Id,
+                        task.AssignedUser.Name,
+                        task.AssignedUser.Email
+                    }
+                    : null,
+                Category = task.Category != null
+                    ? new
+                    {
+                        task.Category.Id,
+                        task.Category.Name
+                    }
+                    : null,
+                task.CreatedAt,
+                task.UpdatedAt,
+                History = task.TaskHistories
                     .OrderBy(h => h.ChangedAt)
                     .Select(h => new
                     {
@@ -187,7 +185,7 @@ namespace server.Controllers
             if (!await _db.Categories.AnyAsync(c => c.Id == dto.CategoryId))
                 return NotFound(new { message = $"Category with Id {dto.CategoryId} does not exist." });
 
-            var todo = new TodoTask
+            var task = new TodoTask
             {
                 Title = dto.Title,
                 Description = dto.Description,
@@ -197,37 +195,32 @@ namespace server.Controllers
                 CategoryId = dto.CategoryId
             };
 
-            _db.Tasks.Add(todo);
+            _db.Tasks.Add(task);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetTask),            
-                new { id = todo.Id },
-                new { todo.Id, todo.Title }
-            );
+            return CreatedAtAction(nameof(GetTask), new { id = task.Id }, new { task.Id, task.Title });
         }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTaskStatus(int id, [FromBody] UpdateTaskDto dto)
         {
-            var todo = await _db.Tasks.FindAsync(id);
-            if (todo == null)
+            var task = await _db.Tasks.FindAsync(id);
+            if (task == null)
                 return NotFound(new { message = $"Task with id {id} not found." });
 
             var isAdmin = User.IsInRole("Admin");
             if (!isAdmin)
             {
                 var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(sub, out var userId) || todo.AssignedUserId != userId)
+                if (!int.TryParse(sub, out var userId) || task.AssignedUserId != userId)
                     return Forbid();
             }
 
-            var oldStatus = todo.Status;
+            var oldStatus = task.Status;
             if (dto.Status != oldStatus)
             {
-                todo.Status = dto.Status;
-                todo.UpdatedAt = DateTimeOffset.UtcNow;
+                task.Status = dto.Status;
+                task.UpdatedAt = DateTimeOffset.UtcNow;
 
                 _db.TaskHistories.Add(new TaskHistory
                 {
@@ -242,9 +235,9 @@ namespace server.Controllers
 
             return Ok(new
             {
-                todo.Id,
-                Status = todo.Status.ToString(),
-                UpdatedAt = todo.UpdatedAt
+                task.Id,
+                Status = task.Status.ToString(),
+                task.UpdatedAt
             });
         }
     }
