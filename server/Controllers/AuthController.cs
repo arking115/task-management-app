@@ -84,20 +84,16 @@ namespace server.Controllers
 
             return Ok(new { token = jwt, user.Id, user.Name, user.Email });
         }
+        [Authorize]
+[HttpGet("me")]
+public IActionResult Me()
+{
+    return Ok(new
+    {
+        Id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
+        Email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value,
+        Role = User.FindFirst(ClaimTypes.Role)?.Value
+    });
     }
 }
-
-
-
-
-
-// For testing token creation with postman
-
-//    [Authorize]
-//    [HttpGet("me")]
-//    public IActionResult Me()
-//=> Ok(new {
-//    Id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
-//    Email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value,
-//    Role = User.FindFirst(ClaimTypes.Role)?.Value
-//});
+}
