@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import Tasks from './pages/Tasks';
 import TaskDetail from './pages/TaskDetail';
+import TaskCreate from './pages/TaskCreate';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/tasks/:id" element={<TaskDetail />} />
+          <Route path="/tasks/create" element={<TaskCreate />} />
         </Routes>
       </div>
     </>

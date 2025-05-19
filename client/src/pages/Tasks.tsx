@@ -38,7 +38,7 @@ const Tasks = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [sortField, setSortField] = useState<'date_added' | ''>('date_added');
+  const [sortField, setSortField] = useState<'date_added' | 'status' | 'category'>('date_added');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -48,13 +48,22 @@ const Tasks = () => {
     deadline: '',
     categoryId: '',
   });
+  const statusMap: Record<Task['status'], number> = {
+  New: 0,
+  InProgress: 1,
+  OnHold: 2,
+  Completed: 3,
+  Cancelled: 4,
+};
 
   const fetchData = async () => {
     try {
+      console.log({ sortField, sortOrder });
       const params: any = {};
       if (sortField) {
-        params.sort = sortField;
-        params.order = sortOrder;
+params.sortBy = sortField;
+params.sortOrder = sortOrder;
+
       }
       if (statusFilter) params.status = statusFilter;
       if (categoryFilter) params.category = categoryFilter;
@@ -77,7 +86,7 @@ const Tasks = () => {
     fetchData();
   }, [sortField, sortOrder, statusFilter, categoryFilter]);
 
-  const toggleSort = (field: 'date_added') => {
+  const toggleSort = (field: 'date_added' | 'status' | 'category') => {
     if (sortField === field) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -88,7 +97,7 @@ const Tasks = () => {
 
   const handleStatusChange = async (id: number, status: Task['status']) => {
     try {
-      await axios.put(`/tasks/${id}`, { status });
+      await axios.put(`/tasks/${id}`, { status: statusMap[status] });
       setTasks((prev) =>
         prev.map((task) => (task.id === id ? { ...task, status } : task))
       );
@@ -114,6 +123,16 @@ const Tasks = () => {
     }
   };
 
+  const getHeaderStyle = (field: string): React.CSSProperties => ({
+    ...thStyle,
+    cursor: 'pointer',
+    textDecoration: sortField === field ? 'underline' : undefined,
+    color: sortField === field ? '#4F46E5' : '#374151',
+  });
+
+  const getSortArrow = (field: string) =>
+    sortField === field ? (sortOrder === 'asc' ? '↑' : '↓') : '';
+
   if (loading) return <PageWrapper wide><p>Loading...</p></PageWrapper>;
   if (error) return <PageWrapper wide><p style={{ color: 'red' }}>{error}</p></PageWrapper>;
 
@@ -130,74 +149,28 @@ const Tasks = () => {
         Tasks
       </h1>
 
-      {isAdmin && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            style={{
-              padding: '10px 18px',
-              backgroundColor: '#4F46E5',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              fontSize: '0.95rem',
-              boxShadow: '0 2px 6px rgba(79,70,229,0.3)',
-              cursor: 'pointer',
-              transition: 'background 0.2s ease-in-out',
-            }}
-          >
-            {showForm ? 'Cancel' : '➕ Add Task'}
-          </button>
+{isAdmin && (
+  <div style={{ marginBottom: '1.5rem' }}>
+    <button
+      onClick={() => navigate('/tasks/create')}
+      style={{
+        padding: '10px 18px',
+        backgroundColor: '#4F46E5',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '8px',
+        fontWeight: 'bold',
+        fontSize: '0.95rem',
+        boxShadow: '0 2px 6px rgba(79,70,229,0.3)',
+        cursor: 'pointer',
+        transition: 'background 0.2s ease-in-out',
+      }}
+    >
+      ➕ Add Task
+    </button>
+  </div>
+)}
 
-          {showForm && (
-            <form
-              onSubmit={handleCreateTask}
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-                maxWidth: 500,
-                backgroundColor: '#fff',
-                padding: '1.2rem',
-                borderRadius: '10px',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.05)'
-              }}
-            >
-              <input type="text" placeholder="Title" required
-                value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })} />
-              <textarea placeholder="Description"
-                value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })} />
-              <input type="date" required
-                value={newTask.deadline}
-                onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })} />
-              <select required
-                value={newTask.categoryId}
-                onChange={(e) => setNewTask({ ...newTask, categoryId: e.target.value })}>
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-              <button type="submit" style={{
-                backgroundColor: '#10B981',
-                color: '#fff',
-                padding: '10px 16px',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: 600,
-                fontSize: '0.95rem',
-                cursor: 'pointer',
-              }}>
-                ✅ Create Task
-              </button>
-            </form>
-          )}
-        </div>
-      )}
 
       {/* Task Table */}
       <div style={{
@@ -209,13 +182,17 @@ const Tasks = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: '#F3F4F6' }}>
-              <th style={thStyle} onClick={() => toggleSort('date_added')}>
-                Date Added {sortField === 'date_added' && (sortOrder === 'asc' ? '▲' : '▼')}
+              <th style={getHeaderStyle('date_added')} onClick={() => toggleSort('date_added')}>
+                Date Added {getSortArrow('date_added')}
               </th>
               <th style={thStyle}>Title</th>
               <th style={thStyle}>Assigned</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Category</th>
+              <th style={getHeaderStyle('status')} onClick={() => toggleSort('status')}>
+                Status {getSortArrow('status')}
+              </th>
+              <th style={getHeaderStyle('category')} onClick={() => toggleSort('category')}>
+                Category {getSortArrow('category')}
+              </th>
               {isAdmin && <th style={thStyle}>Actions</th>}
             </tr>
           </thead>
@@ -244,7 +221,7 @@ const Tasks = () => {
                       cursor: 'pointer',
                       appearance: 'none',
                     }}
-                    onClick={(e) => e.stopPropagation()} // prevent row click on dropdown
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <option value="New">New</option>
                     <option value="InProgress">In Progress</option>
