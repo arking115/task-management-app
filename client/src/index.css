@@ -9,6 +9,7 @@
 
 body {
   margin: 0;
+  padding:0;
   background-color: var(--bg);
   color: var(--text);
   display: flex;
@@ -41,3 +42,6 @@ a:hover {
   }
 }
 
+button:hover {
+  background-color: #4338ca;
+}
