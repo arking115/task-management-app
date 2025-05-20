@@ -21,6 +21,7 @@ const PageWrapper = ({
     >
       <div
         style={{
+          height: '100%',
           width: '100%',
           maxWidth: wide ? '1280px' : '768px',
           backgroundColor: 'rgba(255, 255, 255, 0.95)',

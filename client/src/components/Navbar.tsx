@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const { userRole } = useAuth();
+  const isAdmin = userRole === 'admin';
 
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   if (isAuthPage) return null;
 
   const linkStyle: React.CSSProperties = {
@@ -68,6 +71,11 @@ const Navbar = () => {
           <HoverableLink to="/tasks" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
             Tasks
           </HoverableLink>
+          {isAdmin && (
+            <HoverableLink to="/admin_panel" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+              Admin Panel
+            </HoverableLink>
+          )}
         </div>
       </div>
 

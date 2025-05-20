@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 interface Task {
   id: number;
@@ -37,33 +38,27 @@ const Tasks = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showForm, setShowForm] = useState(false);
   const [sortField, setSortField] = useState<'date_added' | 'status' | 'category'>('date_added');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
-    deadline: '',
-    categoryId: '',
-  });
+  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
+  const [taskDetails, setTaskDetails] = useState<Record<number, Task>>({});
+
   const statusMap: Record<Task['status'], number> = {
-  New: 0,
-  InProgress: 1,
-  OnHold: 2,
-  Completed: 3,
-  Cancelled: 4,
-};
+    New: 0,
+    InProgress: 1,
+    OnHold: 2,
+    Completed: 3,
+    Cancelled: 4,
+  };
 
   const fetchData = async () => {
     try {
-      console.log({ sortField, sortOrder });
       const params: any = {};
       if (sortField) {
-params.sortBy = sortField;
-params.sortOrder = sortOrder;
-
+        params.sortBy = sortField;
+        params.sortOrder = sortOrder;
       }
       if (statusFilter) params.status = statusFilter;
       if (categoryFilter) params.category = categoryFilter;
@@ -106,20 +101,36 @@ params.sortOrder = sortOrder;
     }
   };
 
-  const handleCreateTask = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleExpandTask = async (taskId: number) => {
+    if (expandedTaskId === taskId) {
+      setExpandedTaskId(null);
+      return;
+    }
+
+    if (!taskDetails[taskId]) {
+      try {
+        const res = await axios.get(`/tasks/${taskId}`);
+        setTaskDetails((prev) => ({ ...prev, [taskId]: res.data }));
+      } catch (err) {
+        console.error(`Failed to fetch task ${taskId} details`, err);
+        return;
+      }
+    }
+
+    setExpandedTaskId(taskId);
+  };
+
+  const handleDelete = async (id: number) => {
+    const confirm = window.confirm('Are you sure you want to delete this task?');
+    if (!confirm) return;
+
     try {
-      const response = await axios.post('/tasks', {
-        title: newTask.title,
-        description: newTask.description,
-        deadline: newTask.deadline,
-        categoryId: parseInt(newTask.categoryId),
-      });
-      setTasks((prev) => [...prev, response.data]);
-      setNewTask({ title: '', description: '', deadline: '', categoryId: '' });
-      setShowForm(false);
+      await axios.delete(`/tasks/${id}`);
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+      setExpandedTaskId(null);
     } catch (err) {
-      console.error('Failed to create task', err);
+      console.error('Failed to delete task', err);
+      alert('Failed to delete task.');
     }
   };
 
@@ -149,7 +160,7 @@ params.sortOrder = sortOrder;
         Tasks
       </h1>
 
-{isAdmin && (
+      {isAdmin && (
   <div style={{ marginBottom: '1.5rem' }}>
     <button
       onClick={() => navigate('/tasks/create')}
@@ -172,7 +183,6 @@ params.sortOrder = sortOrder;
 )}
 
 
-      {/* Task Table */}
       <div style={{
         backgroundColor: '#fff',
         borderRadius: '12px',
@@ -197,43 +207,108 @@ params.sortOrder = sortOrder;
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task) => (
-              <tr
-                key={task.id}
-                style={{ borderBottom: '1px solid #E5E7EB', cursor: 'pointer' }}
-                onClick={() => navigate(`/tasks/${task.id}`)}
-              >
-                <td style={tdStyle}>{new Date(task.createdAt).toLocaleDateString()}</td>
-                <td style={tdStyle}>{task.title}</td>
-                <td style={tdStyle}>{task.assignedUser?.name || '—'}</td>
-                <td style={tdStyle}>
-                  <select
-                    value={task.status}
-                    onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
-                    style={{
-                      backgroundColor: statusColors[task.status] + '20',
-                      color: statusColors[task.status],
-                      border: `1px solid ${statusColors[task.status]}70`,
-                      borderRadius: '999px',
-                      padding: '6px 12px',
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      appearance: 'none',
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <option value="New">New</option>
-                    <option value="InProgress">In Progress</option>
-                    <option value="OnHold">On Hold</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </td>
-                <td style={tdStyle}>{task.category.name}</td>
-                {isAdmin && <td style={tdStyle}>—</td>}
-              </tr>
-            ))}
+{tasks.map((task) => (
+  <React.Fragment key={task.id}>
+    <tr>
+      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>
+        {new Date(task.createdAt).toLocaleDateString()}
+      </td>
+      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.title}</td>
+      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.assignedUser?.name || '—'}</td>
+      <td style={tdStyle}>
+        <select
+          value={task.status}
+          onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+          style={{
+            backgroundColor: statusColors[task.status] + '20',
+            color: statusColors[task.status],
+            border: `1px solid ${statusColors[task.status]}70`,
+            borderRadius: '999px',
+            padding: '6px 12px',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            appearance: 'none',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <option value="New">New</option>
+          <option value="InProgress">In Progress</option>
+          <option value="OnHold">On Hold</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </td>
+      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.category.name}</td>
+      {isAdmin && (
+        <td style={tdStyle}>
+          <select
+            onChange={(e) => {
+              const action = e.target.value;
+              if (action === 'edit') navigate(`/tasks/edit/${task.id}`);
+              else if (action === 'delete') handleDelete(task.id);
+              e.currentTarget.selectedIndex = 0; // reset to default
+            }}
+            defaultValue=""
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              fontSize: '0.9rem',
+              backgroundColor: '#F9FAFB',
+              cursor: 'pointer',
+            }}
+          >
+            <option disabled value="">Select</option>
+            <option value="edit">✏️ Edit</option>
+            <option value="delete">🗑️ Delete</option>
+          </select>
+        </td>
+      )}
+    </tr>
+
+    {expandedTaskId === task.id && taskDetails[task.id] && (
+      <tr>
+        <td colSpan={isAdmin ? 6 : 5} style={{ padding: '1rem 2rem', backgroundColor: '#f9fafb' }}>
+          <div style={{
+            animation: 'zoomIn 0.3s ease',
+            transformOrigin: 'top',
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            padding: '1rem',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setExpandedTaskId(null)}
+              style={{
+                position: 'absolute',
+                top: '0.5rem',
+                right: '0.5rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '1.2rem',
+                cursor: 'pointer',
+                color: '#9CA3AF'
+              }}
+              title="Close"
+            >
+              ×
+            </button>
+            <h3 style={{ margin: '0 0 0.5rem' }}>{taskDetails[task.id].title}</h3>
+            <p style={{ marginBottom: '1rem', color: '#4B5563' }}>
+              {taskDetails[task.id].description?.trim() || 'No description provided.'}
+            </p>
+            <p><strong>Status:</strong> {taskDetails[task.id].status}</p>
+            <p><strong>Deadline:</strong> {new Date(taskDetails[task.id].deadline).toLocaleDateString()}</p>
+            <p><strong>Assigned User:</strong> {taskDetails[task.id].assignedUser.name} ({taskDetails[task.id].assignedUser.email})</p>
+          </div>
+        </td>
+      </tr>
+    )}
+  </React.Fragment>
+))}
+
           </tbody>
         </table>
       </div>
