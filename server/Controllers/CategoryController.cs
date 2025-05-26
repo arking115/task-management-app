@@ -45,4 +45,18 @@ public class CategoryController : ControllerBase
             new { cat.Id, cat.Name }
         );
     }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        var cat = await _db.Categories.FindAsync(id);
+        if (cat == null)
+            return NotFound(new { message = $"Category with id {id} not found." });
+
+        _db.Categories.Remove(cat);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
 }

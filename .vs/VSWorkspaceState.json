@@ -5,9 +5,8 @@
     "\\server\\bin",
     "\\server\\Controllers",
     "\\server\\Data",
-    "\\server\\Models",
-    "\\server\\obj"
+    "\\server\\Models"
   ],
-  "SelectedNode": "\\server\\Controllers\\TaskController.cs",
+  "SelectedNode": "\\server\\Controllers\\AdminTasksController.cs",
   "PreviewInSolutionExplorer": false
 }

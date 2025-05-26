@@ -42,17 +42,18 @@ namespace server.Controllers
                         : null,
                     Category = new
                     {
-                        t.Category.Id,
-                        t.Category.Name
+                        Id = t.Category != null ? (int?)t.Category.Id : null,
+                        Name = t.Category != null ? t.Category.Name : "Uncategorized"
                     },
                     t.CreatedAt,
                     t.UpdatedAt
                 })
                 .ToListAsync();
 
-
             return Ok(tasks);
         }
+
+
 
         public record AdminUpdateTaskDto(
             string? Title,
