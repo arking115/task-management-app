@@ -249,5 +249,19 @@ switch (sortBy?.ToLowerInvariant())
                 task.UpdatedAt
             });
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteTask(int id)
+        {
+            var todo = await _db.Tasks.FindAsync(id);
+            if (todo == null)
+                return NotFound(new { message = $"Task with id {id} not found." });
+
+            _db.Tasks.Remove(todo);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
+
     }
 }
