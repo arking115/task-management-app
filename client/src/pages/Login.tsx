@@ -35,6 +35,9 @@ const Login = () => {
 
       if (role === 'admin' || role === 'user') {
         login(role);
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userRole', role);
+
       } else {
         throw new Error('Invalid role in token.');
       }

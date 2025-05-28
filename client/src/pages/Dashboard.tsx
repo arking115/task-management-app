@@ -25,12 +25,14 @@ const Dashboard = () => {
   const [statusCounts, setStatusCounts] = useState<StatusCounts | null>(null);
   const [totalTasks, setTotalTasks] = useState<number>(0);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     axios
       .get('/auth/me', { withCredentials: true })
-      .then(() => {
+      .then((res) => {
         setAuthenticated(true);
+        setUsername(res.data.name); // assumes backend returns user's name
         return axios.get('/dashboard', { withCredentials: true });
       })
       .then((res) => {
@@ -91,17 +93,42 @@ const Dashboard = () => {
   });
 
   return (
+  <div style={{ position: 'relative', minHeight: '100vh' }}>
+    <div className="animated-background"></div>
     <PageWrapper>
+      {/* Welcome Message */}
+      
+      <div
+        style={{
+          background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
+          padding: '2.5rem 3rem',
+          borderRadius: '16px',
+          color: '#ffffff',
+          boxShadow: '0 6px 20px rgba(79,70,229,0.25)',
+          marginBottom: '2rem',
+          textAlign: 'left'
+        }}
+      >
+<h1 style={{ animation: 'fadeInUp 0.6s ease-out' }}>
+  👋 Hello{username ? `, ${username}` : ''}!
+</h1>
+
+        <p style={{ fontSize: '1.15rem', opacity: 0.95 }}>
+          Here's a quick look at your productivity and task breakdown.
+        </p>
+      </div>
+
+      {/* Main Content */}
       <div
         style={{
           display: 'flex',
           flexWrap: 'nowrap',
           gap: '2rem',
-          marginTop: '2rem',
           alignItems: 'flex-start',
+          flexDirection: 'row',
         }}
       >
-        {/* Stats Column */}
+        {/* Stats Panel */}
         <div
           style={{
             flex: 1,
@@ -139,7 +166,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Chart Column */}
+        {/* Chart Panel */}
         <div
           style={{
             flex: 1,
@@ -176,6 +203,7 @@ const Dashboard = () => {
         </div>
       </div>
     </PageWrapper>
+      </div>
   );
 };
 

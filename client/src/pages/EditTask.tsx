@@ -3,22 +3,37 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import PageWrapper from '../components/PageWrapper';
 
+interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  deadline: string;
+  status: string;
+  category?: { id: number; name: string };
+  assignedUserId?: number;
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
 const EditTask = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [task, setTask] = useState<any>(null);
-  const [categories, setCategories] = useState([]);
+  const [task, setTask] = useState<Task | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const statusMap: Record<string, number> = {
-  New: 0,
-  InProgress: 1,
-  OnHold: 2,
-  Completed: 3,
-  Cancelled: 4,
-};
+    New: 0,
+    InProgress: 1,
+    OnHold: 2,
+    Completed: 3,
+    Cancelled: 4,
+  };
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -42,28 +57,42 @@ const EditTask = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setTask((prev: any) => ({ ...prev, [name]: value }));
+    setTask((prev) => {
+      if (!prev) return prev;
+      if (name === 'categoryId') {
+        return {
+          ...prev,
+          category: {
+  id: parseInt(value),
+  name: prev.category?.name || ''
+},
+        };
+      }
+      return { ...prev, [name]: value };
+    });
   };
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    const payload = {
-      title: task.title,
-      description: task.description,
-      status: statusMap[task.status], // convert to int
-      deadline: new Date(task.deadline).toISOString(), // ISO format
-      assignedUserId: task.assignedUser?.id || task.assignedUserId || 0,
-      categoryId: parseInt(task.category.id),
-    };
 
-    await axios.put(`/admin/tasks/${id}`, payload);
-    navigate('/tasks');
-  } catch (err) {
-    console.error(err);
-    alert('Failed to update task.');
-  }
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!task) return;
 
+    try {
+      const payload = {
+        title: task.title,
+        description: task.description,
+        status: statusMap[task.status],
+        deadline: new Date(task.deadline).toISOString(),
+        assignedUserId: task.assignedUserId || 0,
+        categoryId: task.category?.id || 0,
+      };
+
+      await axios.put(`/admin/tasks/${id}`, payload);
+      navigate('/admin?tab=tasks');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update task.');
+    }
+  };
 
   if (loading) return <PageWrapper><p>Loading...</p></PageWrapper>;
   if (error) return <PageWrapper><p style={{ color: 'red' }}>{error}</p></PageWrapper>;
@@ -103,13 +132,26 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <div style={fieldStyle}>
             <label style={labelStyle}>Deadline</label>
-            <input type="date" name="deadline" value={task.deadline.split('T')[0]} onChange={handleChange} style={inputStyle} />
+            <input
+              type="date"
+              name="deadline"
+              value={task.deadline.split('T')[0]}
+              onChange={handleChange}
+              min={new Date().toISOString().split('T')[0]} // ✅ no past dates
+              style={inputStyle}/>
+
           </div>
 
           <div style={fieldStyle}>
             <label style={labelStyle}>Category</label>
-            <select name="category.id" value={task.category.id} onChange={handleChange} style={inputStyle}>
-              {categories.map((cat: any) => (
+            <select
+              name="categoryId"
+              value={task.category?.id || ''}
+              onChange={handleChange}
+              style={inputStyle}
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>

@@ -10,7 +10,6 @@ using server.Data;
 using server.Models;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace server.Controllers
 {
     [ApiController]
@@ -64,9 +63,10 @@ namespace server.Controllers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub,    user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email,  user.Email),
-                new Claim(ClaimTypes.Role,                user.Role.ToString())
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(ClaimTypes.Name, user.Name) // ✅ Add user's name to the token
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -84,16 +84,20 @@ namespace server.Controllers
 
             return Ok(new { token = jwt, user.Id, user.Name, user.Email });
         }
+
         [Authorize]
-[HttpGet("me")]
-public IActionResult Me()
-{
-    return Ok(new
-    {
-        Id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
-        Email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value,
-        Role = User.FindFirst(ClaimTypes.Role)?.Value
-    });
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            return Ok(new
+            {
+                Id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value,
+                Email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value,
+                Role = User.FindFirst(ClaimTypes.Role)?.Value,
+                Name = User.FindFirst(ClaimTypes.Name)?.Value 
+                       ?? User.FindFirst("name")?.Value 
+                       ?? User.Identity?.Name
+            });
+        }
     }
-}
 }
