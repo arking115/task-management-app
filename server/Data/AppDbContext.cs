@@ -69,6 +69,11 @@ namespace server.Data
             histEntity
                 .Property(h => h.NewStatus)
                 .HasConversion<string>();
+            histEntity
+              .HasOne(h => h.ChangedByUser)
+              .WithMany()
+              .HasForeignKey(h => h.ChangedByUserId)
+              .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
