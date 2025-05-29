@@ -20,6 +20,7 @@ namespace server.Controllers
         {
             var history = await _db.TaskHistories
                 .Include(h => h.TodoTask)
+                .Include(h => h.ChangedByUser)
                 .OrderByDescending(h => h.ChangedAt)
                 .Select(h => new
                 {
@@ -28,7 +29,13 @@ namespace server.Controllers
                     TaskTitle = h.TodoTask.Title,
                     OldStatus = h.OldStatus.ToString(),
                     NewStatus = h.NewStatus.ToString(),
-                    h.ChangedAt
+                    h.ChangedAt,
+                    ChangedBy = new
+                    {
+                        h.ChangedByUser.Id,
+                        h.ChangedByUser.Name,
+                        h.ChangedByUser.Email
+                    }
                 })
                 .ToListAsync();
 

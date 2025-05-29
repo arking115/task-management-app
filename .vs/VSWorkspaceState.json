@@ -7,6 +7,6 @@
     "\\server\\Data",
     "\\server\\Models"
   ],
-  "SelectedNode": "\\server\\Controllers\\AdminTasksController.cs",
+  "SelectedNode": "\\server\\Controllers\\TaskController.cs",
   "PreviewInSolutionExplorer": false
 }

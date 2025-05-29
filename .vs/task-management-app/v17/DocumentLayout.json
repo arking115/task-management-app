@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "D:\\facultate\\II project\\task-management-app\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTasksController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Controllers\\AdminTasksController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\TaskController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Controllers\\TaskController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Models\\TaskHistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Models\\TaskHistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Data\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -17,6 +13,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTaskHistoryController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Controllers\\AdminTaskHistoryController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTasksController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Controllers\\AdminTasksController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\TaskController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:server\\Controllers\\TaskController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminUsersController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -55,55 +59,71 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "TaskHistory.cs",
+              "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Models\\TaskHistory.cs",
+              "RelativeDocumentMoniker": "server\\Models\\TaskHistory.cs",
+              "ToolTip": "D:\\facultate\\II project\\task-management-app\\server\\Models\\TaskHistory.cs",
+              "RelativeToolTip": "server\\Models\\TaskHistory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-29T12:32:50.2Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "AdminTasksController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTasksController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\AdminTasksController.cs",
               "ToolTip": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTasksController.cs",
               "RelativeToolTip": "server\\Controllers\\AdminTasksController.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAACQAAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAADkAAAAAAAAAAAAAACQAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-05T19:19:20.562Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "server\\Data\\AppDbContext.cs",
               "ToolTip": "D:\\facultate\\II project\\task-management-app\\server\\Data\\AppDbContext.cs",
               "RelativeToolTip": "server\\Data\\AppDbContext.cs",
-              "ViewState": "AQIAACoAAAAAAAAAAAAAADwAAAAoAAAA",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAEkAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T17:42:35.52Z"
+              "WhenOpened": "2025-05-05T17:42:35.52Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "TaskController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\TaskController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\TaskController.cs",
               "ToolTip": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\TaskController.cs",
               "RelativeToolTip": "server\\Controllers\\TaskController.cs",
-              "ViewState": "AQIAAF4AAAAAAAAAAAAkwGYAAAAxAAAA",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAkwGYAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T17:45:03.098Z"
+              "WhenOpened": "2025-05-05T17:45:03.098Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "AdminTaskHistoryController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTaskHistoryController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\AdminTaskHistoryController.cs",
               "ToolTip": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminTaskHistoryController.cs",
               "RelativeToolTip": "server\\Controllers\\AdminTaskHistoryController.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAA0AAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T19:20:22.723Z"
+              "WhenOpened": "2025-05-05T19:20:22.723Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AdminUsersController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\AdminUsersController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\AdminUsersController.cs",
@@ -115,7 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "CategoryController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\CategoryController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\CategoryController.cs",
@@ -127,7 +147,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Program.cs",
               "RelativeDocumentMoniker": "server\\Program.cs",
@@ -139,7 +159,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "DashboardController.cs",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\Controllers\\DashboardController.cs",
               "RelativeDocumentMoniker": "server\\Controllers\\DashboardController.cs",
@@ -151,7 +171,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\facultate\\II project\\task-management-app\\server\\appsettings.json",
               "RelativeDocumentMoniker": "server\\appsettings.json",
