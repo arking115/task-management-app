@@ -4,10 +4,14 @@ import UserManagement from './UserManagement';
 import TaskManagement from './TaskManagement';
 import TaskHistory from './TaskHistory';
 import { useAuth } from '../contexts/AuthContext';
+import CategoryManagement from './CategoryManagement';
+import { useLocation } from 'react-router-dom';
+
 
 const AdminPanel = () => {
   const { userRole } = useAuth();
-  const [activeTab, setActiveTab] = useState<'users' | 'tasks' | 'history'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'tasks' | 'history' | 'categories'>('users');
+
 
   if (userRole !== 'admin') {
     return (
@@ -53,6 +57,14 @@ const AdminPanel = () => {
             </button>
             <p style={descStyle}>Browse the log of all task updates and status changes.</p>
           </div>
+
+          <div>
+            <button onClick={() => setActiveTab('categories')} style={tabStyle(activeTab === 'categories')}>
+              📂 Category Management
+            </button>
+            <p style={descStyle}>View and delete task categories. Tasks go to 'Uncategorized' if their category is removed.</p>
+          </div>
+
         </aside>
 
         {/* Content area */}
@@ -60,9 +72,11 @@ const AdminPanel = () => {
           {activeTab === 'users' && <UserManagement />}
           {activeTab === 'tasks' && <TaskManagement />}
           {activeTab === 'history' && <TaskHistory />}
+          {activeTab === 'categories' && <CategoryManagement />}
         </section>
       </div>
     </PageWrapper>
+    
   );
 };
 

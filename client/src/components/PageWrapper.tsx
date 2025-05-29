@@ -1,4 +1,4 @@
-import React from 'react';
+import Footer from './Footer';
 
 const PageWrapper = ({
   children,
@@ -10,7 +10,7 @@ const PageWrapper = ({
   return (
     <div
       style={{
-        minHeight: '85vh',
+        minHeight: '100vh',
         width: '100%',
         background: 'linear-gradient(to bottom right, #eef2ff, #f9fafb)',
         padding: '4rem 1.5rem',
@@ -31,9 +31,14 @@ const PageWrapper = ({
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(200, 200, 255, 0.25)',
           transition: 'box-shadow 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '600px', // fill screen minus top padding
+          justifyContent: 'space-between', // 👈 Push footer to bottom
         }}
       >
-        {children}
+        <div style={{ flex: 1 }}>{children}</div>
+        <Footer />
       </div>
     </div>
   );

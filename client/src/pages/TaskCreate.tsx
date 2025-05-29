@@ -32,6 +32,9 @@ const TaskCreate = () => {
     assignedUserId: '',
   });
 
+  // 📅 Today's date in YYYY-MM-DD, used to prevent selecting past dates
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     if (!isAdmin) {
       navigate('/dashboard');
@@ -60,7 +63,7 @@ const TaskCreate = () => {
     try {
       const res = await axios.post('/categories', { name: newCategory });
       setCategories((prev) => [...prev, res.data]);
-      setForm((f) => ({ ...f, categoryId: res.data.id }));
+      setForm((f) => ({ ...f, categoryId: res.data.id.toString() }));
       setNewCategory('');
     } catch (err) {
       console.error(err);
@@ -68,66 +71,81 @@ const TaskCreate = () => {
     }
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-  try {
-    await axios.post('/tasks', {
-      title: form.title,
-      description: form.description,
-      deadline: new Date(form.deadline).toISOString(), // ✅ ISO format
-      status: 0, // ✅ 0 = "New"
-      assignedUserId: parseInt(form.assignedUserId),
-      categoryId: parseInt(form.categoryId),
-    });
+    // Extra front‑end guard – should never fire because <input min={today}> already blocks past dates
+    if (new Date(form.deadline) < new Date(today)) {
+      setError('Deadline can\'t be in the past.');
+      return;
+    }
 
-    navigate('/tasks');
-  } catch (err: any) {
-    console.error('Error details:', err.response?.data);
-    setError(err.response?.data?.message || 'Failed to create task.');
-  }
-};
+    try {
+      await axios.post('/tasks', {
+        title: form.title,
+        description: form.description,
+        deadline: new Date(form.deadline).toISOString(), // ✅ ISO format
+        status: 0, // ✅ 0 = "New"
+        assignedUserId: parseInt(form.assignedUserId),
+        categoryId: parseInt(form.categoryId),
+      });
 
+      navigate('/tasks');
+    } catch (err: any) {
+      console.error('Error details:', err.response?.data);
+      setError(err.response?.data?.message || 'Failed to create task.');
+    }
+  };
 
   return (
     <PageWrapper wide>
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '4rem',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        width: '100%',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '4rem',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
         {/* Left column: Title + Subtext */}
         <div style={{ flex: 1, minWidth: 280 }}>
-          <h1 style={{
-            fontSize: '2.5rem',
-            marginBottom: '0.5rem',
-            background: 'linear-gradient(to right, #4F46E5, #6366F1)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
+          <h1
+            style={{
+              fontSize: '2.5rem',
+              marginBottom: '0.5rem',
+              background: 'linear-gradient(to right, #4F46E5, #6366F1)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
             Create New Task ✍️
           </h1>
           <p style={{ fontSize: '1.05rem', color: '#6B7280' }}>
-            Fill out the form to create a new task. You can choose from existing categories,
-            assign a user, and set a deadline. Want a new category? Just add one below!
+            Fill out the form to create a new task. You can choose from existing
+            categories, assign a user, and set a deadline. Want a new category?
+            Just add one below!
           </p>
           {error && <p style={{ color: '#EF4444', marginTop: '1rem' }}>{error}</p>}
         </div>
 
         {/* Right column: Form */}
-        <div style={{
-          flex: 1,
-          minWidth: 360,
-          backgroundColor: '#fff',
-          padding: '2rem',
-          borderRadius: '1.5rem',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-        }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 360,
+            backgroundColor: '#fff',
+            padding: '2rem',
+            borderRadius: '1.5rem',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+          }}
+        >
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          >
             <input
               type="text"
               placeholder="Title"
@@ -147,6 +165,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               value={form.deadline}
               onChange={(e) => setForm({ ...form, deadline: e.target.value })}
               required
+              min={today} // 🚫 Prevent past dates
               style={inputStyle}
             />
 
@@ -159,7 +178,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             >
               <option value="">Select Category</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
             </select>
 
@@ -172,11 +193,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 onChange={(e) => setNewCategory(e.target.value)}
                 style={{ ...inputStyle, flex: 1 }}
               />
-              <button
-                type="button"
-                onClick={handleCreateCategory}
-                style={addBtnStyle}
-              >
+              <button type="button" onClick={handleCreateCategory} style={addBtnStyle}>
                 + Add
               </button>
             </div>
@@ -190,7 +207,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             >
               <option value="">Assign to User</option>
               {users.map((u) => (
-                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                <option key={u.id} value={u.id}>
+                  {u.name} ({u.email})
+                </option>
               ))}
             </select>
 

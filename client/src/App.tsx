@@ -8,11 +8,10 @@ import TaskDetail from './pages/TaskDetail';
 import TaskCreate from './pages/TaskCreate';
 import EditTask from './pages/EditTask';
 import AdminPanel from './pages/AdminPanel';
-
+import './App.css';
 
 function App() {
-  return (
-    <>
+  return (<div>
       <Navbar />
       <div style={{ paddingTop: '60px' }}>
         <Routes>
@@ -25,10 +24,9 @@ function App() {
           <Route path="/tasks/create" element={<TaskCreate />} />
           <Route path="/tasks/edit/:id" element={<EditTask />} />
           <Route path="/admin_panel" element={<AdminPanel />} />
-          
         </Routes>
       </div>
-    </>
+      </div>
   );
 }
 

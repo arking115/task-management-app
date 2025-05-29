@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
+import ModalPortal from '../components/ModalPortal';
 
 interface User {
   id: number;
@@ -12,35 +13,35 @@ const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [modalUserId, setModalUserId] = useState<number | null>(null);
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get('/admin/users');
-      setUsers(res.data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load users.');
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    axios.get('/admin/users')
+      .then(res => setUsers(res.data))
+      .catch(() => setError('Failed to load users.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const confirmDelete = (id: number) => {
+    setModalUserId(id);
   };
 
-  const handleDelete = async (id: number) => {
-    const confirm = window.confirm('Are you sure you want to delete this user?');
-    if (!confirm) return;
+  const cancelDelete = () => {
+    setModalUserId(null);
+  };
 
+  const performDelete = async () => {
+    if (modalUserId === null) return;
     try {
-      await axios.delete(`/admin/users/${id}`);
-      setUsers((prev) => prev.filter((user) => user.id !== id));
+      await axios.delete(`/admin/users/${modalUserId}`);
+      setUsers(prev => prev.filter(user => user.id !== modalUserId));
     } catch (err) {
       console.error('Failed to delete user', err);
       alert('Failed to delete user.');
+    } finally {
+      setModalUserId(null);
     }
   };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   if (loading) return <p>Loading users...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
@@ -79,7 +80,7 @@ const UserManagement = () => {
               </td>
               <td style={tdStyle}>
                 <button
-                  onClick={() => handleDelete(user.id)}
+                  onClick={() => confirmDelete(user.id)}
                   style={{
                     backgroundColor: '#EF4444',
                     color: '#fff',
@@ -97,6 +98,49 @@ const UserManagement = () => {
           ))}
         </tbody>
       </table>
+
+      {modalUserId !== null && (
+        <ModalPortal>
+          <div style={modalBackdropStyle}>
+            <div style={modalStyle}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Delete this user?</h3>
+              <p style={{ marginBottom: '1.5rem', color: '#6B7280' }}>
+                This action is permanent and cannot be undone.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <button
+                  onClick={cancelDelete}
+                  style={{
+                    backgroundColor: '#E5E7EB',
+                    color: '#1F2937',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={performDelete}
+                  style={{
+                    backgroundColor: '#EF4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </ModalPortal>
+      )}
     </div>
   );
 };
@@ -113,6 +157,29 @@ const tdStyle: React.CSSProperties = {
   padding: '12px 16px',
   fontSize: '0.95rem',
   color: '#111827',
+};
+
+const modalBackdropStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  backdropFilter: 'blur(4px)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 9999,
+};
+
+const modalStyle: React.CSSProperties = {
+  backgroundColor: '#fff',
+  padding: '2rem',
+  borderRadius: '12px',
+  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
+  minWidth: '320px',
+  maxWidth: '90%',
 };
 
 export default UserManagement;

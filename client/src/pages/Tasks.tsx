@@ -12,8 +12,8 @@ interface Task {
   status: 'New' | 'InProgress' | 'OnHold' | 'Completed' | 'Cancelled';
   deadline: string;
   createdAt: string;
-  category: { id: number; name: string };
-  assignedUser: { id: number; name: string; email: string };
+  category?: { id: number; name: string } | null;
+  assignedUser?: { id: number; name: string; email: string } | null;
 }
 
 interface Category {
@@ -120,20 +120,6 @@ const Tasks = () => {
     setExpandedTaskId(taskId);
   };
 
-  const handleDelete = async (id: number) => {
-    const confirm = window.confirm('Are you sure you want to delete this task?');
-    if (!confirm) return;
-
-    try {
-      await axios.delete(`/tasks/${id}`);
-      setTasks((prev) => prev.filter((task) => task.id !== id));
-      setExpandedTaskId(null);
-    } catch (err) {
-      console.error('Failed to delete task', err);
-      alert('Failed to delete task.');
-    }
-  };
-
   const getHeaderStyle = (field: string): React.CSSProperties => ({
     ...thStyle,
     cursor: 'pointer',
@@ -149,22 +135,26 @@ const Tasks = () => {
 
   return (
     <PageWrapper wide>
-      <h1 style={{
-        fontSize: '2.2rem',
-        marginBottom: '1rem',
-        color: '#4F46E5',
-        background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
-      }}>
-        Tasks
-      </h1>
+<div style={{ marginBottom: '1.5rem' }}>
+  <h1 style={{
+    fontSize: '2.2rem',
+    margin: 0,
+    color: '#4F46E5',
+    background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  }}>
+    Here are your tasks
+  </h1>
+  <p style={{ marginTop: '0.25rem', color: '#4B5563', fontSize: '1rem' }}>
+    Stay on top of your work and track task progress below.
+  </p>
 
-      {isAdmin && (
-  <div style={{ marginBottom: '1.5rem' }}>
+  {isAdmin && (
     <button
       onClick={() => navigate('/tasks/create')}
       style={{
+        marginTop: '1rem',
         padding: '10px 18px',
         backgroundColor: '#4F46E5',
         color: '#fff',
@@ -179,8 +169,9 @@ const Tasks = () => {
     >
       ➕ Add Task
     </button>
-  </div>
-)}
+  )}
+</div>
+
 
 
       <div style={{
@@ -203,112 +194,89 @@ const Tasks = () => {
               <th style={getHeaderStyle('category')} onClick={() => toggleSort('category')}>
                 Category {getSortArrow('category')}
               </th>
-              {isAdmin && <th style={thStyle}>Actions</th>}
             </tr>
           </thead>
           <tbody>
-{tasks.map((task) => (
-  <React.Fragment key={task.id}>
-    <tr>
-      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>
-        {new Date(task.createdAt).toLocaleDateString()}
-      </td>
-      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.title}</td>
-      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.assignedUser?.name || '—'}</td>
-      <td style={tdStyle}>
-        <select
-          value={task.status}
-          onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
-          style={{
-            backgroundColor: statusColors[task.status] + '20',
-            color: statusColors[task.status],
-            border: `1px solid ${statusColors[task.status]}70`,
-            borderRadius: '999px',
-            padding: '6px 12px',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            appearance: 'none',
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <option value="New">New</option>
-          <option value="InProgress">In Progress</option>
-          <option value="OnHold">On Hold</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-      </td>
-      <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.category.name}</td>
-      {isAdmin && (
-        <td style={tdStyle}>
-          <select
-            onChange={(e) => {
-              const action = e.target.value;
-              if (action === 'edit') navigate(`/tasks/edit/${task.id}`);
-              else if (action === 'delete') handleDelete(task.id);
-              e.currentTarget.selectedIndex = 0; // reset to default
-            }}
-            defaultValue=""
-            style={{
-              padding: '6px 10px',
-              borderRadius: '6px',
-              border: '1px solid #D1D5DB',
-              fontSize: '0.9rem',
-              backgroundColor: '#F9FAFB',
-              cursor: 'pointer',
-            }}
-          >
-            <option disabled value="">Select</option>
-            <option value="edit">✏️ Edit</option>
-            <option value="delete">🗑️ Delete</option>
-          </select>
-        </td>
-      )}
-    </tr>
+            {tasks.map((task) => (
+              <React.Fragment key={task.id}>
+                <tr>
+                  <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>
+                    {new Date(task.createdAt).toLocaleDateString()}
+                  </td>
+                  <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>{task.title}</td>
+                  <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>
+                    {task.assignedUser?.name || '—'}
+                  </td>
+                  <td style={tdStyle}>
+                    <select
+                      value={task.status}
+                      onChange={(e) => handleStatusChange(task.id, e.target.value as Task['status'])}
+                      style={{
+                        backgroundColor: statusColors[task.status] + '20',
+                        color: statusColors[task.status],
+                        border: `1px solid ${statusColors[task.status]}70`,
+                        borderRadius: '999px',
+                        padding: '6px 12px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        appearance: 'none',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <option value="New">New</option>
+                      <option value="InProgress">In Progress</option>
+                      <option value="OnHold">On Hold</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                  <td style={tdStyle} onClick={() => handleExpandTask(task.id)}>
+                    {task.category?.name || 'Uncategorized'}
+                  </td>
+                </tr>
 
-    {expandedTaskId === task.id && taskDetails[task.id] && (
-      <tr>
-        <td colSpan={isAdmin ? 6 : 5} style={{ padding: '1rem 2rem', backgroundColor: '#f9fafb' }}>
-          <div style={{
-            animation: 'zoomIn 0.3s ease',
-            transformOrigin: 'top',
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            padding: '1rem',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-            position: 'relative'
-          }}>
-            <button
-              onClick={() => setExpandedTaskId(null)}
-              style={{
-                position: 'absolute',
-                top: '0.5rem',
-                right: '0.5rem',
-                background: 'transparent',
-                border: 'none',
-                fontSize: '1.2rem',
-                cursor: 'pointer',
-                color: '#9CA3AF'
-              }}
-              title="Close"
-            >
-              ×
-            </button>
-            <h3 style={{ margin: '0 0 0.5rem' }}>{taskDetails[task.id].title}</h3>
-            <p style={{ marginBottom: '1rem', color: '#4B5563' }}>
-              {taskDetails[task.id].description?.trim() || 'No description provided.'}
-            </p>
-            <p><strong>Status:</strong> {taskDetails[task.id].status}</p>
-            <p><strong>Deadline:</strong> {new Date(taskDetails[task.id].deadline).toLocaleDateString()}</p>
-            <p><strong>Assigned User:</strong> {taskDetails[task.id].assignedUser.name} ({taskDetails[task.id].assignedUser.email})</p>
-          </div>
-        </td>
-      </tr>
-    )}
-  </React.Fragment>
-))}
-
+                {expandedTaskId === task.id && taskDetails[task.id] && (
+                  <tr>
+                    <td colSpan={5} style={{ padding: '1rem 2rem', backgroundColor: '#f9fafb' }}>
+                      <div style={{
+                        animation: 'zoomIn 0.3s ease',
+                        transformOrigin: 'top',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+                        position: 'relative'
+                      }}>
+                        <button
+                          onClick={() => setExpandedTaskId(null)}
+                          style={{
+                            position: 'absolute',
+                            top: '0.5rem',
+                            right: '0.5rem',
+                            background: 'transparent',
+                            border: 'none',
+                            fontSize: '1.2rem',
+                            cursor: 'pointer',
+                            color: '#9CA3AF'
+                          }}
+                          title="Close"
+                        >
+                          ×
+                        </button>
+                        <h3 style={{ margin: '0 0 0.5rem' }}>{taskDetails[task.id].title}</h3>
+                        <p style={{ marginBottom: '1rem', color: '#4B5563' }}>
+                          {taskDetails[task.id].description?.trim() || 'No description provided.'}
+                        </p>
+                        <p><strong>Status:</strong> {taskDetails[task.id].status}</p>
+                        <p><strong>Deadline:</strong> {new Date(taskDetails[task.id].deadline).toLocaleDateString()}</p>
+                        <p><strong>Assigned User:</strong> {taskDetails[task.id].assignedUser?.name || '—'} ({taskDetails[task.id].assignedUser?.email || 'N/A'})</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
           </tbody>
         </table>
       </div>
