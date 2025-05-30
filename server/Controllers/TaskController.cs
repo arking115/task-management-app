@@ -42,19 +42,15 @@ namespace server.Controllers
             [FromQuery] string? sortBy,
             [FromQuery] string? sortOrder)
         {
-            var isAdmin = User.IsInRole("Admin");
+            var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(sub, out var userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
+
             var q = _db.Tasks
                 .Include(t => t.AssignedUser)
                 .Include(t => t.Category)
+                .Where(t => t.AssignedUserId == userId)
                 .AsQueryable();
-
-            if (!isAdmin)
-            {
-                var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(sub, out var userId))
-                    return Unauthorized(new { message = "Invalid user ID in token." });
-                q = q.Where(t => t.AssignedUserId == userId);
-            }
 
             if (!string.IsNullOrEmpty(status))
             {
@@ -70,33 +66,33 @@ namespace server.Controllers
 
             var direction = sortOrder?.Equals("desc", StringComparison.OrdinalIgnoreCase) == true ? "desc" : "asc";
 
-switch (sortBy?.ToLowerInvariant())
-{
-    case "title":
-        q = direction == "asc" ? q.OrderBy(t => t.Title) : q.OrderByDescending(t => t.Title);
-        break;
-    case "deadline":
-        q = direction == "asc" ? q.OrderBy(t => t.Deadline) : q.OrderByDescending(t => t.Deadline);
-        break;
-    case "updatedat":
-        q = direction == "asc" ? q.OrderBy(t => t.UpdatedAt) : q.OrderByDescending(t => t.UpdatedAt);
-        break;
-    case "createdat":
-    case "date_added":
-        q = direction == "asc" ? q.OrderBy(t => t.CreatedAt) : q.OrderByDescending(t => t.CreatedAt);
-        break;
-    case "status":
-        q = direction == "asc" ? q.OrderBy(t => t.Status) : q.OrderByDescending(t => t.Status);
-        break;
-    case "category":
-        q = direction == "asc"
-            ? q.OrderBy(t => t.Category.Name)
-            : q.OrderByDescending(t => t.Category.Name);
-        break;
-    default:
-        q = q.OrderByDescending(t => t.CreatedAt);
-        break;
-}
+            switch (sortBy?.ToLowerInvariant())
+            {
+                case "title":
+                    q = direction == "asc" ? q.OrderBy(t => t.Title) : q.OrderByDescending(t => t.Title);
+                    break;
+                case "deadline":
+                    q = direction == "asc" ? q.OrderBy(t => t.Deadline) : q.OrderByDescending(t => t.Deadline);
+                    break;
+                case "updatedat":
+                    q = direction == "asc" ? q.OrderBy(t => t.UpdatedAt) : q.OrderByDescending(t => t.UpdatedAt);
+                    break;
+                case "createdat":
+                case "date_added":
+                    q = direction == "asc" ? q.OrderBy(t => t.CreatedAt) : q.OrderByDescending(t => t.CreatedAt);
+                    break;
+                case "status":
+                    q = direction == "asc" ? q.OrderBy(t => t.Status) : q.OrderByDescending(t => t.Status);
+                    break;
+                case "category":
+                    q = direction == "asc"
+                        ? q.OrderBy(t => t.Category.Name)
+                        : q.OrderByDescending(t => t.Category.Name);
+                    break;
+                default:
+                    q = q.OrderByDescending(t => t.CreatedAt);
+                    break;
+            }
 
             var list = await q
                 .Select(t => new
