@@ -227,12 +227,17 @@ namespace server.Controllers
                 task.Status = dto.Status;
                 task.UpdatedAt = DateTimeOffset.UtcNow;
 
+                var currentUserId = int.Parse(
+                    User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+                );
+
                 _db.TaskHistories.Add(new TaskHistory
                 {
                     TodoTaskId = id,
                     OldStatus = oldStatus,
                     NewStatus = dto.Status,
-                    ChangedAt = DateTimeOffset.UtcNow
+                    ChangedAt = DateTimeOffset.UtcNow,
+                    ChangedByUserId = currentUserId
                 });
             }
 

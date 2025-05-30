@@ -62,7 +62,6 @@ namespace server.Data
                 .WithMany(t => t.TaskHistories)
                 .HasForeignKey(h => h.TodoTaskId)
                 .OnDelete(DeleteBehavior.Cascade);
-
             histEntity
                 .Property(h => h.OldStatus)
                 .HasConversion<string>();
@@ -73,7 +72,7 @@ namespace server.Data
               .HasOne(h => h.ChangedByUser)
               .WithMany()
               .HasForeignKey(h => h.ChangedByUserId)
-              .OnDelete(DeleteBehavior.Restrict);
+              .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

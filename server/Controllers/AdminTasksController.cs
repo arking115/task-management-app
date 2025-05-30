@@ -8,6 +8,8 @@ using server.Data;
 using server.Models;
 using StatusEnum = server.Models.TaskStatus;  
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+
 
 namespace server.Controllers
 {
@@ -71,22 +73,23 @@ namespace server.Controllers
             if (task == null)
                 return NotFound(new { message = $"Task with Id {id} not found." });
 
-            // track status change
-            StatusEnum? oldStatus = null;
             if (dto.Status.HasValue && dto.Status.Value != task.Status)
             {
-                oldStatus = task.Status;
+                var oldStatus = task.Status;
                 task.Status = dto.Status.Value;
+
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
                 _db.TaskHistories.Add(new TaskHistory
                 {
                     TodoTaskId = id,
-                    OldStatus = oldStatus.Value,
+                    OldStatus = oldStatus,
                     NewStatus = dto.Status.Value,
-                    ChangedAt = DateTimeOffset.UtcNow
+                    ChangedAt = DateTimeOffset.UtcNow,
+                    ChangedByUserId = currentUserId
                 });
             }
 
-            // reassign?
             if (dto.AssignedUserId.HasValue)
             {
                 if (!await _db.Users.AnyAsync(u => u.Id == dto.AssignedUserId.Value))
@@ -94,7 +97,6 @@ namespace server.Controllers
                 task.AssignedUserId = dto.AssignedUserId.Value;
             }
 
-            // change category?
             if (dto.CategoryId.HasValue)
             {
                 if (!await _db.Categories.AnyAsync(c => c.Id == dto.CategoryId.Value))
@@ -102,7 +104,6 @@ namespace server.Controllers
                 task.CategoryId = dto.CategoryId.Value;
             }
 
-            // update other fields
             if (dto.Title != null) task.Title = dto.Title;
             if (dto.Description != null) task.Description = dto.Description;
             if (dto.Deadline.HasValue) task.Deadline = dto.Deadline.Value;

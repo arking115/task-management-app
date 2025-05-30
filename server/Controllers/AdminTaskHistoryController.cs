@@ -30,12 +30,14 @@ namespace server.Controllers
                     OldStatus = h.OldStatus.ToString(),
                     NewStatus = h.NewStatus.ToString(),
                     h.ChangedAt,
-                    ChangedBy = new
+                    ChangedBy = h.ChangedByUser != null
+                    ? new
                     {
                         h.ChangedByUser.Id,
                         h.ChangedByUser.Name,
                         h.ChangedByUser.Email
                     }
+                    : null
                 })
                 .ToListAsync();
 

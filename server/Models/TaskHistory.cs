@@ -20,8 +20,8 @@ namespace server.Models
         [Required]
         public DateTimeOffset ChangedAt { get; set; } = DateTimeOffset.UtcNow;
 
-        [Required]
-        public int ChangedByUserId { get; set; }
-        public User ChangedByUser { get; set; } = null!;
+        public int? ChangedByUserId { get; set; }
+
+        public User? ChangedByUser { get; set; }
     }
 }
