@@ -99,7 +99,6 @@ const TaskDetail = () => {
               textAlign: 'center',
             }}
           >
-            Admin features coming soon: assign users, edit details, log history...
           </div>
         )}
       </div>

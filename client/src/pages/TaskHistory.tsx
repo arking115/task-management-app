@@ -6,7 +6,11 @@ interface LogEntry {
   taskTitle: string;
   oldStatus: string;
   newStatus: string;
-  changedBy: string;
+  changedBy: {
+    id: number;
+    name: string;
+    email: string;
+  };
   changedAt: string;
 }
 const formatStatus = (status: string) =>
@@ -39,12 +43,14 @@ const TaskHistory = () => {
   return (
     <div style={{ padding: '1rem', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>Task History Logs</h2>
+      
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: '#F9FAFB' }}>
             <th style={thStyle}>Task</th>
             <th style={thStyle}>Status Change</th>
+            <th style={thStyle}>Changed By</th>
             <th style={thStyle}>Timestamp</th>
           </tr>
         </thead>
@@ -55,6 +61,7 @@ const TaskHistory = () => {
 <td style={tdStyle}>
   <span style={{ fontWeight: 600, color: '#4F46E5' }}>{formatStatus(log.oldStatus)}</span> → <span style={{ fontWeight: 600, color: '#10B981' }}>{formatStatus(log.newStatus)}</span>
 </td>
+              <td style={tdStyle}>{log.changedBy?.name || 'Unknown'}</td>
               <td style={tdStyle}>{new Date(log.changedAt).toLocaleString()}</td>
             </tr>
           ))}
