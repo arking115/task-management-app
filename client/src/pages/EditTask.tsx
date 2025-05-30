@@ -9,13 +9,19 @@ interface Task {
   description?: string;
   deadline: string;
   status: string;
-  category?: { id: number; name: string };
-  assignedUserId?: number;
+  category?: { id: number; name: string } | null;
+  assignedUserId?: number | null;
 }
 
 interface Category {
   id: number;
   name: string;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
 }
 
 const EditTask = () => {
@@ -24,6 +30,7 @@ const EditTask = () => {
 
   const [task, setTask] = useState<Task | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -36,23 +43,25 @@ const EditTask = () => {
   };
 
   useEffect(() => {
-    const fetchTask = async () => {
+    const fetchData = async () => {
       try {
-        const [taskRes, catRes] = await Promise.all([
+        const [taskRes, catRes, userRes] = await Promise.all([
           axios.get(`/tasks/${id}`),
-          axios.get('/categories')
+          axios.get('/categories'),
+          axios.get('/admin/users')
         ]);
         setTask(taskRes.data);
         setCategories(catRes.data);
+        setUsers(userRes.data);
       } catch (err) {
         console.error(err);
-        setError('Failed to load task');
+        setError('Failed to load task data.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTask();
+    fetchData();
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -62,10 +71,13 @@ const EditTask = () => {
       if (name === 'categoryId') {
         return {
           ...prev,
-          category: {
-  id: parseInt(value),
-  name: prev.category?.name || ''
-},
+          category: { id: parseInt(value), name: '' }
+        };
+      }
+      if (name === 'assignedUserId') {
+        return {
+          ...prev,
+          assignedUserId: value ? parseInt(value) : null
         };
       }
       return { ...prev, [name]: value };
@@ -82,12 +94,12 @@ const EditTask = () => {
         description: task.description,
         status: statusMap[task.status],
         deadline: new Date(task.deadline).toISOString(),
-        assignedUserId: task.assignedUserId || 0,
-        categoryId: task.category?.id || 0,
+        assignedUserId: task.assignedUserId ?? null,
+        categoryId: task.category?.id ?? null
       };
 
       await axios.put(`/admin/tasks/${id}`, payload);
-      navigate('/admin?tab=tasks');
+      navigate('/admin_panel');
     } catch (err) {
       console.error(err);
       alert('Failed to update task.');
@@ -100,24 +112,8 @@ const EditTask = () => {
 
   return (
     <PageWrapper>
-      <div style={{
-        maxWidth: '600px',
-        margin: '2rem auto',
-        backgroundColor: '#ffffff',
-        borderRadius: '16px',
-        padding: '2rem 2.5rem',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.06)'
-      }}>
-        <h2 style={{
-          fontSize: '1.75rem',
-          fontWeight: 700,
-          marginBottom: '1.5rem',
-          background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          Edit Task
-        </h2>
+      <div style={formContainer}>
+        <h2 style={formTitle}>Edit Task</h2>
 
         <form onSubmit={handleSubmit}>
           <div style={fieldStyle}>
@@ -137,16 +133,33 @@ const EditTask = () => {
               name="deadline"
               value={task.deadline.split('T')[0]}
               onChange={handleChange}
-              min={new Date().toISOString().split('T')[0]} // ✅ no past dates
-              style={inputStyle}/>
+              min={new Date().toISOString().split('T')[0]}
+              style={inputStyle}
+            />
+          </div>
 
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Assigned User</label>
+            <select
+              name="assignedUserId"
+              value={task.assignedUserId ?? ''}
+              onChange={handleChange}
+              style={inputStyle}
+            >
+              <option value="">Unassigned</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name} ({user.email})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div style={fieldStyle}>
             <label style={labelStyle}>Category</label>
             <select
               name="categoryId"
-              value={task.category?.id || ''}
+              value={task.category?.id ?? ''}
               onChange={handleChange}
               style={inputStyle}
             >
@@ -173,6 +186,24 @@ const EditTask = () => {
       </div>
     </PageWrapper>
   );
+};
+
+const formContainer: React.CSSProperties = {
+  maxWidth: '600px',
+  margin: '2rem auto',
+  backgroundColor: '#ffffff',
+  borderRadius: '16px',
+  padding: '2rem 2.5rem',
+  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.06)'
+};
+
+const formTitle: React.CSSProperties = {
+  fontSize: '1.75rem',
+  fontWeight: 700,
+  marginBottom: '1.5rem',
+  background: 'linear-gradient(90deg, #4F46E5, #6366F1)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent'
 };
 
 const fieldStyle: React.CSSProperties = {
