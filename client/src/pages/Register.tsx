@@ -28,6 +28,7 @@ const Register = () => {
   };
 
   return (
+    <div style={{ marginTop: '-60px' }}>
     <PageWrapper wide>
       <div
         style={{
@@ -161,6 +162,7 @@ const Register = () => {
         </div>
       </div>
     </PageWrapper>
+    </div>
   );
 };
 

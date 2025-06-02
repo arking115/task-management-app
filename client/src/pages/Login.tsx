@@ -54,6 +54,7 @@ const Login = () => {
   };
 
   return (
+    <div style={{ marginTop: '-60px' }}>
     <PageWrapper>
       <div
         style={{
@@ -165,6 +166,7 @@ const Login = () => {
         </div>
       </div>
     </PageWrapper>
+    </div>
   );
 };
 
