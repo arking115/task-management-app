@@ -1,0 +1,15 @@
+
+<svg width="300" height="260" viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stylised "A" with integrated check mark -->
+  <g fill="#4d7cff">
+    <!-- Main A shape -->
+    <polygon points="75,210 150,30 225,210 195,210 150,100 105,210"/>
+    <!-- Check mark / cross‑bar -->
+    <polygon points="170,135 215,60 240,80 185,165"/>
+  </g>
+
+  <!-- Company name -->
+  <text x="150" y="245" font-family="sans-serif" font-size="36" text-anchor="middle" fill="#000000">
+    AssignHQ
+  </text>
+</svg>

@@ -31,8 +31,6 @@ const TaskCreate = () => {
     categoryId: '',
     assignedUserId: '',
   });
-
-  // 📅 Today's date in YYYY-MM-DD, used to prevent selecting past dates
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
@@ -121,7 +119,7 @@ const TaskCreate = () => {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Create New Task ✍️
+            Create New Task 
           </h1>
           <p style={{ fontSize: '1.05rem', color: '#6B7280' }}>
             Fill out the form to create a new task. You can choose from existing
