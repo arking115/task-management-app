@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/PageWrapper';
-import logo from '../assets/logo.svg';   // ← import the SVG
+import logo from '../assets/logo.svg';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -33,19 +33,19 @@ const Register = () => {
 
   return (
     <div style={{ marginTop: '-60px' }}>
-      <PageWrapper wide>
+      {/* ✂️  removed “wide” so the wrapper matches Login */}
+      <PageWrapper>
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
-            gap: '2rem',
+            gap: '2rem', // same gap as Login
           }}
         >
           {/* Left Side */}
           <div style={{ flex: 1, textAlign: 'center' }}>
-            {/* Logo */}
             <img
               src={logo}
               alt="Task Manager logo"
@@ -110,7 +110,7 @@ const Register = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                   style={{
-                    width: '100%',
+                    width: '90%',
                     padding: '0.75rem 1rem',
                     borderRadius: '8px',
                     border: '1px solid #d1d5db',
@@ -139,7 +139,7 @@ const Register = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   style={{
-                    width: '100%',
+                    width: '90%',
                     padding: '0.75rem 1rem',
                     borderRadius: '8px',
                     border: '1px solid #d1d5db',
@@ -168,7 +168,7 @@ const Register = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   style={{
-                    width: '100%',
+                    width: '90%',
                     padding: '0.75rem 1rem',
                     borderRadius: '8px',
                     border: '1px solid #d1d5db',

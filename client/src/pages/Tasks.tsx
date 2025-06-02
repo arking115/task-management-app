@@ -297,6 +297,7 @@ const tdStyle: React.CSSProperties = {
   padding: '14px 20px',
   fontSize: '0.95rem',
   color: '#111827',
+  textAlign: 'left',          //  <-- NEW
 };
 
 export default Tasks;
