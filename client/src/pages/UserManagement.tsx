@@ -153,10 +153,12 @@ const thStyle: React.CSSProperties = {
   color: '#374151',
 };
 
+// ⬇︎ just append textAlign: 'left'
 const tdStyle: React.CSSProperties = {
-  padding: '12px 16px',
+  padding: '14px 20px',
   fontSize: '0.95rem',
   color: '#111827',
+  textAlign: 'left',          //  <-- NEW
 };
 
 const modalBackdropStyle: React.CSSProperties = {

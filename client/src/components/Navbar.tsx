@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import logo from '../assets/logo.svg';       // ⭐ import the SVG
 
 const Navbar = () => {
   const location = useLocation();
@@ -8,7 +9,8 @@ const Navbar = () => {
   const { userRole } = useAuth();
   const isAdmin = userRole === 'admin';
 
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isAuthPage =
+    location.pathname === '/login' || location.pathname === '/register';
   if (isAuthPage) return null;
 
   const linkStyle: React.CSSProperties = {
@@ -19,12 +21,12 @@ const Navbar = () => {
     color: '#1a1a1a',
     fontSize: '1rem',
     fontWeight: 500,
-    transition: 'background-color 0.2s, box-shadow 0.2s'
+    transition: 'background-color 0.2s, box-shadow 0.2s',
   };
 
   const linkHoverStyle: React.CSSProperties = {
     backgroundColor: '#f5f5f5',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.05)'
+    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
   };
 
   const handleLogout = () => {
@@ -46,33 +48,49 @@ const Navbar = () => {
         alignItems: 'center',
         justifyContent: 'space-between',
         zIndex: 1000,
-        height: '50px'
+        height: '50px',
       }}
     >
       {/* Left Side: Logo and Links */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* 👇 Clickable logo leading to /dashboard */}
         <Link
           to="/dashboard"
           style={{
-            fontWeight: 'bold',
-            fontSize: '1.3rem',
+            display: 'flex',
+            alignItems: 'center',
             textDecoration: 'none',
-            color: '#1a1a1a',
-            marginRight: '2rem'
+            marginRight: '2rem',
           }}
         >
-          Task Manager
+          <img
+            src={logo}
+            alt="Task Manager logo"
+            style={{ height: '90px', width: 'auto' }}
+          />
         </Link>
 
         <div style={{ display: 'flex', gap: '1.2rem' }}>
-          <HoverableLink to="/dashboard" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+          <HoverableLink
+            to="/dashboard"
+            baseStyle={linkStyle}
+            hoverStyle={linkHoverStyle}
+          >
             Dashboard
           </HoverableLink>
-          <HoverableLink to="/tasks" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+          <HoverableLink
+            to="/tasks"
+            baseStyle={linkStyle}
+            hoverStyle={linkHoverStyle}
+          >
             Tasks
           </HoverableLink>
           {isAdmin && (
-            <HoverableLink to="/admin_panel" baseStyle={linkStyle} hoverStyle={linkHoverStyle}>
+            <HoverableLink
+              to="/admin_panel"
+              baseStyle={linkStyle}
+              hoverStyle={linkHoverStyle}
+            >
               Admin Panel
             </HoverableLink>
           )}
@@ -90,7 +108,7 @@ const Navbar = () => {
           color: '#fff',
           fontWeight: 'bold',
           cursor: 'pointer',
-          fontSize: '0.95rem'
+          fontSize: '0.95rem',
         }}
       >
         Logout
@@ -104,7 +122,7 @@ const HoverableLink = ({
   to,
   baseStyle,
   hoverStyle,
-  children
+  children,
 }: {
   to: string;
   baseStyle: React.CSSProperties;

@@ -214,8 +214,10 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
   marginBottom: '0.5rem',
   fontWeight: 600,
-  color: '#374151'
+  color: '#374151',
+  textAlign: 'left',          // ← add this
 };
+
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -224,8 +226,10 @@ const inputStyle: React.CSSProperties = {
   borderRadius: '8px',
   fontSize: '1rem',
   backgroundColor: '#F9FAFB',
-  color: '#111827'
+  color: '#111827',
+  boxSizing: 'border-box',   // ← keeps every field the exact same width
 };
+
 
 const buttonStyle: React.CSSProperties = {
   backgroundColor: '#4F46E5',

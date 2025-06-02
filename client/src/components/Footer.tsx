@@ -11,7 +11,7 @@ const Footer = () => {
         background: 'transparent',
       }}
     >
-      <p>© 2025 Task Manager. All rights reserved.</p>
+      <p>© 2025 AssingHQ. All rights reserved.</p>
       {/* Optionally add: */}
       {/* <p><a href="/terms">Terms</a> • <a href="/privacy">Privacy</a></p> */}
     </footer>

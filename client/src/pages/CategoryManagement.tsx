@@ -127,9 +127,14 @@ const thStyle: React.CSSProperties = {
   borderBottom: '1px solid #ccc'
 };
 
+// ⬇︎ just append textAlign: 'left'
 const tdStyle: React.CSSProperties = {
-  padding: '8px'
+  padding: '14px 20px',
+  fontSize: '0.95rem',
+  color: '#111827',
+  textAlign: 'left',          //  <-- NEW
 };
+
 
 const modalBackdropStyle: React.CSSProperties = {
   position: 'fixed',
