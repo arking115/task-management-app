@@ -28,140 +28,150 @@ const Register = () => {
   };
 
   return (
-    <div style={{ marginTop: '-60px' }}>
-    <PageWrapper wide>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          gap: '4rem',
-        }}
-      >
-        {/* Left Side */}
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#4f46e5' }}>
-            Create an Account 
-          </h1>
-          <p style={{ color: '#6b7280', fontSize: '1.1rem', maxWidth: '400px' }}>
-            Start managing your tasks efficiently and stay on top of your goals. Register to begin!
-          </p>
-        </div>
-
-        {/* Right Side: Form */}
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '2rem',
+        backgroundColor: '#f9fafb',
+      }}
+    >
+      <PageWrapper>
         <div
           style={{
-            flex: 1,
-            maxWidth: '480px',
-            backgroundColor: '#fff',
-            padding: '2.5rem',
-            borderRadius: '1.5rem',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            width: '100%',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            gap: '4rem',
+            textAlign: 'center',
           }}
         >
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.75rem' }}>Register</h2>
-          <form onSubmit={handleRegister}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="name"
-                style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}
-              >
-                Name:
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+          {/* Left side text */}
+          <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#4f46e5' }}>
+              Create an Account
+            </h1>
+            <p style={{ color: '#6b7280', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
+              Start managing your tasks efficiently and stay on top of your goals. Register to begin!
+            </p>
+          </div>
+
+          {/* Right side: Register Card */}
+          <div
+            style={{
+              flex: 1,
+              maxWidth: '480px',
+              backgroundColor: '#fff',
+              padding: '2.5rem',
+              borderRadius: '1.5rem',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+            }}
+          >
+            <h2 style={{ fontSize: '1.75rem' }}>Register</h2>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <label htmlFor="name" style={{ marginBottom: '0.5rem', fontWeight: 500 }}>
+                  Name:
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  style={{
+                    width: '85%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d1d5db',
+                    fontSize: '1rem',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <label htmlFor="email" style={{ marginBottom: '0.5rem', fontWeight: 500 }}>
+                  Email:
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{
+                    width: '85%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d1d5db',
+                    fontSize: '1rem',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <label htmlFor="password" style={{ marginBottom: '0.5rem', fontWeight: 500 }}>
+                  Password:
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{
+                    width: '85%',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d1d5db',
+                    fontSize: '1rem',
+                  }}
+                />
+              </div>
+
+              {error && (
+                <p style={{ color: '#dc2626', fontSize: '0.9rem' }}>{error}</p>
+              )}
+
+              <button
+                type="submit"
                 style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
+                  width: '95.8%',
+                  padding: '0.75rem',
+                  backgroundColor: '#4f46e5',
+                  color: 'white',
+                  border: 'none',
                   borderRadius: '8px',
-                  border: '1px solid #d1d5db',
+                  fontWeight: 600,
                   fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease',
                 }}
-              />
-            </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="email"
-                style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#4338ca')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#4f46e5')}
               >
-                Email:
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '1rem',
-                }}
-              />
-            </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="password"
-                style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}
-              >
-                Password:
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '1px solid #d1d5db',
-                  fontSize: '1rem',
-                }}
-              />
-            </div>
-            {error && (
-              <p style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: 600,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s ease',
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#4338ca')}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#4f46e5')}
-            >
-              Register
-            </button>
-          </form>
-          <p style={{ marginTop: '1.25rem', fontSize: '0.95rem' }}>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: '#4f46e5', fontWeight: 500 }}>
-              Login here
-            </Link>
-          </p>
+                Register
+              </button>
+            </form>
+
+            <p style={{ fontSize: '0.95rem' }}>
+              Already have an account?{' '}
+              <Link to="/login" style={{ color: '#4f46e5', fontWeight: 500 }}>
+                Login here
+              </Link>
+            </p>
+          </div>
         </div>
-      </div>
-    </PageWrapper>
+      </PageWrapper>
     </div>
   );
 };

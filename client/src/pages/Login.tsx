@@ -54,23 +54,36 @@ const Login = () => {
   };
 
   return (
-    <div style={{ marginTop: '-60px' }}>
+  <div
+    style={{
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '2rem',
+      backgroundColor: '#f9fafb',
+    }}
+  >
     <PageWrapper>
       <div
         style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          flexWrap: 'wrap',
           width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto',
           gap: '4rem',
+          textAlign: 'center',
         }}
       >
-        {/* Left side content for welcome / image */}
+        {/* Left side content */}
         <div style={{ flex: 1 }}>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#4f46e5' }}>
-            Welcome Back 
+            Welcome Back
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '1.1rem', maxWidth: '400px' }}>
+          <p style={{ color: '#6b7280', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
             Log in to your account to manage tasks and stay productive. We're glad to see you again!
           </p>
         </div>
@@ -84,15 +97,15 @@ const Login = () => {
             padding: '2.5rem',
             borderRadius: '1.5rem',
             boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
           }}
         >
-          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.75rem' }}>Login</h2>
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="email"
-                style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}
-              >
+          <h2 style={{ fontSize: '1.75rem' }}>Login</h2>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="email" style={{ marginBottom: '0.5rem', fontWeight: 500 }}>
                 Email:
               </label>
               <input
@@ -102,7 +115,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 style={{
-                  width: '100%',
+                  width: '85%',
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   border: '1px solid #d1d5db',
@@ -110,11 +123,9 @@ const Login = () => {
                 }}
               />
             </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label
-                htmlFor="password"
-                style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}
-              >
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="password" style={{ marginBottom: '0.5rem', fontWeight: 500 }}>
                 Password:
               </label>
               <input
@@ -124,7 +135,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={{
-                  width: '100%',
+                  width: '85%',
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   border: '1px solid #d1d5db',
@@ -132,15 +143,15 @@ const Login = () => {
                 }}
               />
             </div>
+
             {error && (
-              <p style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                {error}
-              </p>
+              <p style={{ color: '#dc2626', fontSize: '0.9rem' }}>{error}</p>
             )}
+
             <button
               type="submit"
               style={{
-                width: '100%',
+                width: '95.8%',
                 padding: '0.75rem',
                 backgroundColor: '#4f46e5',
                 color: 'white',
@@ -157,7 +168,8 @@ const Login = () => {
               Login
             </button>
           </form>
-          <p style={{ marginTop: '1.25rem', fontSize: '0.95rem' }}>
+
+          <p style={{ fontSize: '0.95rem' }}>
             Don't have an account?{' '}
             <Link to="/register" style={{ color: '#4f46e5', fontWeight: 500 }}>
               Register here
@@ -166,8 +178,9 @@ const Login = () => {
         </div>
       </div>
     </PageWrapper>
-    </div>
-  );
+  </div>
+);
+
 };
 
 export default Login;

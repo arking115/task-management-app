@@ -11,7 +11,7 @@ const PageWrapper = ({
     <div
       style={{
         minHeight: '100vh',
-        width: '100%',
+        width: '160%',
         background: 'linear-gradient(to bottom right, #eef2ff, #f9fafb)',
         padding: '4rem 1.5rem',
         display: 'flex',
